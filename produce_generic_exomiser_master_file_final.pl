@@ -45,9 +45,9 @@ my %var_counts;
 open(EXOMISER_MASTER_FILE,">exomiser_master_file_final_allvars.tsv");
 print EXOMISER_MASTER_FILE "Sample ID\tGene\tVariant\tGenotypes\tExomiserMOI\tFunctional Class\tMax Freq\tGnomAD Freq\tDe novo\tRank\tScore\tVariant Score\tPheno Score\tHuman Pheno Score\tBest Evidence\tHuman Evidence\tMouse Evidence\tFish Evidence\tHuman PPI Evidence\tHGVS\tAssembly\tFam Structure\tHPO IDs\tHPO terms\n";
 open(IN,"$samples_file");
-while (my $sampleLine = <IN>){
+while (my $sample_line = <IN>){
     chop $sample_line;
-    my ($exomiser_sample,$fam_size,$hpo_ids,$hpo_terms) = split(/\t/,$sample_line);
+    my ($exomiser_sample,$fam_structure,$hpo_ids,$hpo_terms) = split(/\t/,$sample_line);
     $total_case_count++;
     my %exomiser_results;
     my %func_class_store;
@@ -64,8 +64,8 @@ while (my $sampleLine = <IN>){
     my %max_freq_store;
     my %gnomad_freq;
 
-    my $exomiser_gene_file = $exomiser_sample."_exomiser.genes.tsv";
-    open(IN2,"/re_gecip/enhanced_interpretation/dsmedley/exomiser-cli-13.2.1/results/$exomiser_gene_file");
+    my $exomiser_gene_file = $exomiser_sample.".genes.tsv";
+    open(IN2,"$exomiser_gene_file");
     my $line = <IN2>;
     while ($line = <IN2>){
         chop $line;
@@ -100,8 +100,8 @@ while (my $sampleLine = <IN>){
     }
     close IN2;
     
-    my $exomiser_file = $exomiser_sample."_exomiser.variants.tsv";
-    open(IN2,"/re_gecip/enhanced_interpretation/dsmedley/exomiser-cli-13.2.1/results/$exomiser_file");
+    my $exomiser_file = $exomiser_sample.".variants.tsv";
+    open(IN2,"$exomiser_file");
     $line = <IN2>;
     my $last_gene = '';
     my $last_gene_combined_score = '';
