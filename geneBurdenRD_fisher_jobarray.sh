@@ -2,7 +2,7 @@
 #BSUB -P re_gecip_enhanced_interpretation
 #BSUB -o cluster/geneBurdenRD_fisher_jobarray_%J_%I.stdout
 #BSUB -e cluster/geneBurdenRD_fisher_jobarray_%J_%I.stderr
-#BSUB -cwd /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD
+#BSUB -cwd /geneBurdenRD
 #BSUB -n 2 
 #BSUB -J geneBurdenRD_fisher_jobarray[1-226]
 #BSUB -R rusage[mem=10000]
@@ -20,5 +20,5 @@ Rscript scripts/geneBurdenRD_fisher_jobarray.R 'LSB_JOBINDEX' "data/analysisLabe
 
 # 1. Uncomment: runMode <- "cluster" in geneBurdenRD_fisher_jobarray.R
 # 2. ssh cluster
-# 3. bsub < /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD/scripts/geneBurdenRD_fisher_jobarray.sh 
+# 3. bsub < /geneBurdenRD/scripts/geneBurdenRD_fisher_jobarray.sh 
 # 4. bjobs 
