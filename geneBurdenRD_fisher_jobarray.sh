@@ -14,7 +14,7 @@ module load lang/R/4.1.0-foss-2019b
 # args[1]. job index: e.g. 'LSB_JOBINDEX'
 # arg[2]. path for file containing list of case-control analysis labels: e.g. "data/analysisLabelList.tsv"
 
-Rscript scripts/geneBurdenRD_fisher_jobarray.R 'LSB_JOBINDEX' "data/analysisLabelList.tsv"
+Rscript /geneBurdenRD/scripts/geneBurdenRD_fisher_jobarray.R 'LSB_JOBINDEX' "data/analysisLabelList.tsv"
 
 # To run this script:
 
