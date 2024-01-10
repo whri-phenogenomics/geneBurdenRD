@@ -2,7 +2,7 @@
 #BSUB -P re_gecip_enhanced_interpretation
 #BSUB -o cluster/geneBurdenRD_padjust_%J.stdout
 #BSUB -e cluster/geneBurdenRD_padjust_%J.stderr
-#BSUB -cwd /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD
+#BSUB -cwd /geneBurdenRD
 #BSUB -n 1
 #BSUB -R rusage[mem=20000]
 #BSUB -M 20000
@@ -17,5 +17,5 @@ Rscript scripts/geneBurdenRD_padjust.R "geneBurdenRD"
 # To run this script:
 
 # 1. ssh cluster
-# 2. bsub < /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD/scripts/geneBurdenRD_padjust.sh 
+# 2. bsub < /geneBurdenRD/scripts/geneBurdenRD_padjust.sh 
 # 3. bjobs 
