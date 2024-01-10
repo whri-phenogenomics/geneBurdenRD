@@ -7,13 +7,23 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
+# Select runMode, either local-interactive or cluster ----
+#runMode <- "local-inter"
+runMode <- "cluster"
+
+# Load libraries ----
+if (! requireNamespace("tidyverse", quietly = TRUE)) {
+  install.packages("tidyverse")
+  loadNamespace("tidyverse")
+}
+
 library(tidyverse)
 
 #Load results FDR file
 
 path_to_analysis<-getwd()
 
-setwd(path_to_analysis)
+setwd(path_to_analysis)      # e.g.setwd("/Users/Desktop/geneBurdenRD")
 
 plots <- "plots"
 dir.create(file.path("./", plots), showWarnings = FALSE)
@@ -31,8 +41,20 @@ pval_DF<-read_tsv(file_to_read)
 
 #Chose p adjust FDR threshold to use either provided by user or default 0.05
 
-if(length(args) == 4){
+
+if (runMode == "cluster") {
   
+  if(length(args)<3){
+    
+    stop(print(paste("only ",length(args)," arguments provided, please provide [3] mandatory arguments")))
+    
+  }
+
+} 
+
+if(length(args)>=4){
+  
+  print("Argument[4] provided")
   p.adjust.fdr_threshold <-args[4]
   p.adjust.fdr_threshold <-as.numeric(p.adjust.fdr_threshold) #provided by user e.g. "0.01"
   print(paste0("FRD threshold manually set to : ", p.adjust.fdr_threshold))
@@ -50,10 +72,17 @@ sign_pval_DF<-pval_DF %>% filter(p.adjust.fdr<=p.adjust.fdr_threshold)
 
 #Retrieve additional information from your masterfile
 
-exomiserFile <- args[2]  # e.g. "/re_gecip/enhanced_interpretation/dsmedley/exomiser_master_file_final_01_12_23.tsv" <--- either user-provided file, or output file from geneBurdenRD_prepare.R/.sh scripts
-exomiser.extrainfo <- read_tsv(exomiserFile)
+if (runMode == "local-inter") {
+  
+  exomiserFile <- "data/exomiser_master_file_passvars.tsv" # <--- output file from Damian's pipeline; user-provided path
+  
+} else {
+  
+  exomiserFile <- args[2] # e.g. "data/exomiser_master_file_passvars.tsv"
+  
+}
 
-#exomiser.extrainfo <- read_tsv("/home/lvestito/re_gecip/enhanced_interpretation/dsmedley/exomiser_master_file_final_01_12_23.tsv")
+exomiser.extrainfo <- read_tsv(exomiserFile)
 
 #Make column name lower case
 colnames(exomiser.extrainfo) <- make.names(tolower(colnames(exomiser.extrainfo)))
@@ -128,13 +157,33 @@ sign_analysis_label<-as.data.frame(table(sign_pval_DF$analysis.label))
 names(sign_analysis_label)[names(sign_analysis_label) == 'Var1'] <- 'analysis.label'
 
 #Load disease list
-analysisLabelListFile <- args[3] # <-- user-provided (e.g. /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD/data/analysisLabelList.tsv)
+
+if (runMode == "local-inter") {
+  
+  analysisLabelListFile <- "data/analysisLabelList.tsv" # <--- output file from Damian's pipeline; user-provided path
+  
+} else {
+  
+  analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv"
+  
+}
+
 analyses <- read_tsv(analysisLabelListFile)
 
 
-# Get the jobindex from cluster ----
-# jobindex <- as.numeric(Sys.getenv('LSB_JOBINDEX')) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-jobindex <- as.numeric(Sys.getenv(args[1])) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
+if (runMode == "local-inter") {
+  
+  # Define the jobindex as # of analysis interactively (for example, jobindex <- 1 to select the first analysis) ----
+  jobindex <- 1
+  
+} else {
+  
+  # Get the jobindex from cluster ----
+  # jobindex <- as.numeric(Sys.getenv('LSB_JOBINDEX')) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
+  jobindex <- as.numeric(Sys.getenv(args[1])) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
+  
+}
+
 disease <- analyses[jobindex, ] %>% .[[1]]
 
 #Stop analysis if disease label has no significant signals
@@ -164,7 +213,7 @@ if (length(args) == 5) {
     
   }else {
     
-    plotting=="Y"
+    plotting<-"Y"
     
   }
 
@@ -197,61 +246,33 @@ if(plotting=="Y"){
   #######################################################
   #    Annotate genes using BiomaRt if outside the RE   #
   #######################################################
+  # Load libraries ----
+  if (! requireNamespace("biomaRt", quietly = TRUE)) {
+    install.packages("biomaRt")
+    loadNamespace("biomaRt")
+  }
   
-  #if (!requireNamespace("BiocManager", quietly = TRUE))
-  #  install.packages("BiocManager")
+  library("biomaRt")
   
-  #BiocManager::install("biomaRt")
-  
-  #library("biomaRt")
-  #listMarts()
-  
-  #ensembl <- useMart("ensembl")
-  #ensembl <- useDataset("hsapiens_gene_ensembl",mart=ensembl)
-  #annotation<-getBM(attributes=c('hgnc_symbol','chromosome_name', 'start_position', 'end_position','uniprot_gn_symbol','uniprotswissprot','description','strand'),
-  #                  filters=c('hgnc_symbol'),
-  #                  values=list(sign_genes$gene),
-  #                  mart=ensembl)
-  
-
-  
-  ##############################################
-  #    Annotate using BiomaRt file in the RE   #
-  ##############################################
-  
-  #If in the RE and no access to BiomaRt
-  
-  annotation<-read.csv("/re_gecip/enhanced_interpretation/lvestito/gene_burden/data/biomart_export_unique_extra.tsv",sep="\t",header=TRUE)
-  
-  annotation<-annotation %>% mutate_all(as.character)
-  
-  names(annotation)[1:9] <- c("hgnc_symbol", "start_position", "end_position","description","strand","chromosome_name","gene_synonym","uniprot_gn_symbol","uniprotswissprot")
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
+  ensembl <- useDataset("hsapiens_gene_ensembl",mart=ensembl)
+  annotation<-getBM(attributes=c('hgnc_symbol','chromosome_name', 'start_position', 'end_position','uniprot_gn_symbol','uniprotswissprot','description','strand'),
+                    filters=c('hgnc_symbol'),
+                    values=list(sign_genes$gene),
+                    mart=ensembl)
   
   annotation<-annotation[!grepl("CHR_.*",annotation$chromosome_name),]
   annotation<-annotation[!grepl("KI.*",annotation$chromosome_name),]
   annotation<-annotation[!grepl("GL.*",annotation$chromosome_name),]
   
-  #Check number of chromosome annotations
-  
-  chromosomes<-as.data.frame(table(annotation$chromosome_name))
-  
-  if(nrow(chromosomes)!=25){
-    
-    print("Manhattan plot is not available for panel gene burden testing")
-    
-  }
-  
-  
-  
   #Order and remove duplicates
   annotation<-annotation %>% arrange(desc(uniprotswissprot),desc(chromosome_name))
-  annotation_dup<-annotation[!duplicated(annotation[,c('hgnc_symbol','gene_synonym')]),]
   annotation<-annotation[!duplicated(annotation[,c('hgnc_symbol')]),]
   
   #Clean description
   
   annotation$description <- sub("\\[.*","",annotation$description)
-  
+
   #Annotate significant genes
   sign_genes = merge(x=sign_genes, y=annotation, by.x=c("gene"), by.y=c("hgnc_symbol"),all.x = TRUE)
   
@@ -260,38 +281,17 @@ if(plotting=="Y"){
   
   #Check missing annotation in significant genes
   missing_annotation<-sign_genes %>% filter(is.na(sign_genes$uniprotswissprot))
-
-  #Try fising missing annotation using gene synonym
+  
   if(nrow(missing_annotation)>0){
-    for(i in missing_annotation$gene){
-      print(i)
-      
-      x<-annotation_dup %>% filter(gene_synonym==i)
-      
-      if(nrow(x)!=0){
-        
-        sign_genes$chromosome_name<-ifelse(is.na(sign_genes$chromosome_name) == TRUE,x$chromosome_name[match(sign_genes$gene,x$gene_synonym)],sign_genes$chromosome_name)
-        sign_genes$start_position<-ifelse(is.na(sign_genes$start_position) == TRUE,x$start_position[match(sign_genes$gene,x$gene_synonym)],sign_genes$start_position)
-        sign_genes$end_position<-ifelse(is.na(sign_genes$end_position) == TRUE,x$end_position[match(sign_genes$gene,x$gene_synonym)],sign_genes$end_position)
-        sign_genes$strand<-ifelse(is.na(sign_genes$strand) == TRUE,x$strand[match(sign_genes$gene,x$gene_synonym)],sign_genes$strand)
-        sign_genes$gene_synonym<-ifelse(is.na(sign_genes$gene_synonym) == TRUE,x$gene_synonym[match(sign_genes$gene,x$gene_synonym)],sign_genes$gene_synonym)
-        sign_genes$uniprot_gn_symbol<-ifelse(is.na(sign_genes$uniprot_gn_symbol) == TRUE,x$uniprot_gn_symbol[match(sign_genes$gene,x$gene_synonym)],sign_genes$uniprot_gn_symbol)
-        sign_genes$uniprotswissprot<-ifelse(is.na(sign_genes$uniprotswissprot) == TRUE,x$uniprotswissprot[match(sign_genes$gene,x$gene_synonym)],sign_genes$uniprotswissprot)
-        sign_genes$description<-ifelse(is.na(sign_genes$description) == TRUE,x$description[match(sign_genes$gene,x$gene_synonym)],sign_genes$description)
-        
-      }
-    }
+    
+    print(paste0(nrow(missing_annotation), " significant genes out of ",nrow(sign_genes)," have no BioMart annotation: ", paste0(paste0("'", missing_annotation$gene, "'"), collapse = ", ")))
+    
   }else{
     
-    print("Uniprot ID found!")
+    print("no BioMart annotation missing for significant genes")
+    
   }
-  
-  #Check how many still missing
-  sum(is.na(sign_genes$uniprotswissprot))
-  missing_annotation<-sign_genes %>% filter(is.na(sign_genes$uniprotswissprot))
-  
-  print(paste0(nrow(missing_annotation), " significant genes out of ",nrow(sign_genes)," have no BioMart annotation: ", paste0(paste0("'", missing_annotation$gene, "'"), collapse = ", ")))
-  
+
   #update pval FDR dataframe
   pval_DF_annotated = merge(x=pval_DF, y=sign_genes[,c("gene",colnames(sign_genes)[!colnames(sign_genes) %in% colnames(pval_DF)])], by=c("gene"),all.x = TRUE)
   
@@ -329,111 +329,136 @@ if(plotting=="Y"){
     #Significant pvalues above threshold
     pval_DF_analysis_label_sign<-pval_DF_analysis_label %>% dplyr::filter(p.adjust.fdr<=p.adjust.fdr_threshold)
     
-    print(paste0(nrow(pval_DF_analysis_label_sign), " significant gene-disease associations were found in association with ",sign_analysis_label_read))
+    print(paste0(nrow(pval_DF_analysis_label_sign), " significant gene-disease associations found in association with ",sign_analysis_label_read))
+    
+    # Load additional library for plotting ----
+    if (! requireNamespace("ggplot2", quietly = TRUE)) {
+      install.packages("ggplot2")
+      loadNamespace("ggplot2")
+    }
+    if (! requireNamespace("ggrepel", quietly = TRUE)) {
+      install.packages("ggrepel")
+      loadNamespace("ggrepel")
+    }
+
+    library(ggplot2)
+    library(ggrepel)
     
     ###############################
     #       Manhattan plot        #
     ###############################
     
     
-    #table for Manhattan plot
-    pval_DF_analysis_label_manhattan <- pval_DF_analysis_label %>% group_by(chromosome_name,gene) %>% dplyr::arrange(chromosome_name,start_position)
+    #Check number of chromosome annotations
     
-    #Additional annotation for Manhattan plot like chromosome order and deal with missing chromosomes
-    pval_DF_analysis_label_manhattan$chromosome <- NA
-    s <- 0
-    nbp <- c()
+    chromosomes<-as.data.frame(table(annotation$chromosome_name))
     
-    chrOrder <-as.data.frame(table(pval_DF_analysis_label_manhattan$chromosome_name))
-    chr <-c((1:22),"X","Y","MT")
-    chrOrder<-chrOrder[match(chr, chrOrder$Var1),]
-    chrOrder<- chrOrder %>% dplyr::filter(!is.na(chrOrder$Freq))
-    chrOrder<-as.vector(chrOrder$Var1)
-    
-    pval_DF_analysis_label_manhattan$chromosome_name <- factor(pval_DF_analysis_label_manhattan$chromosome_name, chrOrder, ordered=TRUE)
-    pval_DF_analysis_label_manhattan<-pval_DF_analysis_label_manhattan[do.call(order, pval_DF_analysis_label_manhattan[, c("chromosome_name")]), ]
-    
-    for (j in unique(pval_DF_analysis_label_manhattan$chromosome_name)){
-      nbp[j] <- max(pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,]]$start_position)
-      pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"chromosome"]] <- pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"start_position"]] + s
-      s <- s + nbp[j]
+    if(nrow(chromosomes)!=25){
+      
+      print("Manhattan plot is only available on genome wide analysis")
+      
+    }else{
+      
+      #table for Manhattan plot
+      pval_DF_analysis_label_manhattan <- pval_DF_analysis_label %>% group_by(chromosome_name,gene) %>% dplyr::arrange(chromosome_name,start_position)
+      
+      #Additional annotation for Manhattan plot like chromosome order and deal with missing chromosomes
+      pval_DF_analysis_label_manhattan$chromosome <- NA
+      s <- 0
+      nbp <- c()
+      
+      chrOrder <-as.data.frame(table(pval_DF_analysis_label_manhattan$chromosome_name))
+      chr <-c((1:22),"X","Y","MT")
+      chrOrder<-chrOrder[match(chr, chrOrder$Var1),]
+      chrOrder<- chrOrder %>% dplyr::filter(!is.na(chrOrder$Freq))
+      chrOrder<-as.vector(chrOrder$Var1)
+      
+      pval_DF_analysis_label_manhattan$chromosome_name <- factor(pval_DF_analysis_label_manhattan$chromosome_name, chrOrder, ordered=TRUE)
+      pval_DF_analysis_label_manhattan<-pval_DF_analysis_label_manhattan[do.call(order, pval_DF_analysis_label_manhattan[, c("chromosome_name")]), ]
+      
+      for (j in unique(pval_DF_analysis_label_manhattan$chromosome_name)){
+        nbp[j] <- max(pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,]]$start_position)
+        pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"chromosome"]] <- pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"start_position"]] + s
+        s <- s + nbp[j]
+      }
+      
+      #Significant genes whose name will be shown in plot
+      sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<=p.adjust.fdr_threshold)
+      
+      #Set axis
+      axis.set <- pval_DF_analysis_label_manhattan %>% 
+        group_by(chromosome_name) %>% 
+        summarize(center = (max(chromosome) + min(chromosome)) / 2)
+
+      
+      #Generate manhattan plot
+      p <- pval_DF_analysis_label_manhattan %>%
+        group_by(chromosome_name,gene) %>%
+        arrange(chromosome_name,start_position) %>%
+        ggplot( aes(x = chromosome,y = -log10(p.adjust.fdr), color=test, label=gene)) +
+        geom_point(size=2.5) +
+        geom_hline(yintercept = -log10(p.adjust.fdr_threshold), color = "maroon", linetype = "dashed")+ 
+        scale_x_continuous(label = axis.set$chromosome_name, breaks = axis.set$center) +
+        theme_minimal() +
+        theme(panel.border = element_blank(),
+              legend.title = element_blank(),
+              panel.grid.major.x = element_blank(),
+              panel.grid.minor.x = element_blank(),
+              axis.text.x = element_text(angle = 90, size = 8, vjust = 0.5,margin=margin(-15,0,0,0))
+        )
+      
+      temp_plot = p+ 
+        labs(title = sign_analysis_label_read)+
+        geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
+        theme(text = element_text(family = "Bookman",size = 11),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.ticks.x=element_blank(),
+              plot.subtitle = element_text(size=10, hjust=0.5),
+              plot.title=element_text(size=16, 
+                                      face="bold", 
+                                      family="Bookman",
+                                      color="gray60",
+                                      hjust=0.5,
+                                      lineheight=1.2))
+      
+      #print(temp_plot)
+      #save the plot
+      ggsave(temp_plot, file=paste0(disease,"_manhattanplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
+      print(paste0(disease,"_manhattanplot.png saved!"))
+      
+      
+      #Generate volcano plot
+      
+      sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<= p.adjust.fdr_threshold & or >= 3)
+      
+      volcano <- ggplot(pval_DF_analysis_label_manhattan, aes(x = log2(or), y = -log10(p.adjust.fdr), color=test)) +
+        geom_point() +
+        theme_minimal() +
+        geom_hline(yintercept = -log10(p.adjust.fdr_threshold), col = "maroon", linetype = "dashed") +
+        geom_vline(xintercept = log2(3), col = "maroon", linetype = "dashed")
+      
+      
+      temp_plot_volcano = volcano+ 
+        labs(title = sign_analysis_label_read)+
+        geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
+        theme(text = element_text(family = "Bookman",size = 11),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.ticks.x=element_blank(),
+              plot.subtitle = element_text(size=10, hjust=0.5),
+              plot.title=element_text(size=16, 
+                                      face="bold", 
+                                      family="Bookman",
+                                      color="gray60",
+                                      hjust=0.5,
+                                      lineheight=1.2))
+      
+      
+      ggsave(temp_plot_volcano, file=paste0(disease,"_volcanoplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
+      print(paste0(disease,"_volcanoplot.png saved!"))
+      
     }
-    
-    #Significant genes whose name will be shown in plot
-    sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<=p.adjust.fdr_threshold)
-    
-    #Set axis
-    axis.set <- pval_DF_analysis_label_manhattan %>% 
-      group_by(chromosome_name) %>% 
-      summarize(center = (max(chromosome) + min(chromosome)) / 2)
-    
-    #Load additional library for plotting
-    library(ggplot2)
-    library(ggrepel)
-    
-    #Generate manhattan plot
-    p <- pval_DF_analysis_label_manhattan %>%
-      group_by(chromosome_name,gene) %>%
-      arrange(chromosome_name,start_position) %>%
-      ggplot( aes(x = chromosome,y = -log10(p.adjust.fdr), color=test, label=gene)) +
-      geom_point(size=2.5) +
-      geom_hline(yintercept = -log10(p.adjust.fdr_threshold), color = "maroon", linetype = "dashed")+ 
-      scale_x_continuous(label = axis.set$chromosome_name, breaks = axis.set$center) +
-      theme_minimal() +
-      theme(panel.border = element_blank(),
-            legend.title = element_blank(),
-            panel.grid.major.x = element_blank(),
-            panel.grid.minor.x = element_blank(),
-            axis.text.x = element_text(angle = 90, size = 8, vjust = 0.5,margin=margin(-15,0,0,0))
-      )
-    
-    temp_plot = p+ 
-      labs(title = sign_analysis_label_read)+
-      geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
-      theme(text = element_text(family = "Bookman",size = 11),
-            legend.title = element_blank(),
-            legend.text = element_text(size = 10),
-            axis.ticks.x=element_blank(),
-            plot.subtitle = element_text(size=10, hjust=0.5),
-            plot.title=element_text(size=16, 
-                                    face="bold", 
-                                    family="Bookman",
-                                    color="gray60",
-                                    hjust=0.5,
-                                    lineheight=1.2))
-    
-    #print(temp_plot)
-    #save the plot
-    ggsave(temp_plot, file=paste0(disease,"_manhattanplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
-    
-    #Generate volcano plot
-    
-    sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<= p.adjust.fdr_threshold & or >= 3)
-    
-    volcano <- ggplot(pval_DF_analysis_label_manhattan, aes(x = log2(or), y = -log10(p.adjust.fdr), color=test)) +
-      geom_point() +
-      theme_minimal() +
-      geom_hline(yintercept = -log10(p.adjust.fdr_threshold), col = "maroon", linetype = "dashed") +
-      geom_vline(xintercept = log2(3), col = "maroon", linetype = "dashed")
-    
-    
-    temp_plot_volcano = volcano+ 
-      labs(title = sign_analysis_label_read)+
-      geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
-      theme(text = element_text(family = "Bookman",size = 11),
-            legend.title = element_blank(),
-            legend.text = element_text(size = 10),
-            axis.ticks.x=element_blank(),
-            plot.subtitle = element_text(size=10, hjust=0.5),
-            plot.title=element_text(size=16, 
-                                    face="bold", 
-                                    family="Bookman",
-                                    color="gray60",
-                                    hjust=0.5,
-                                    lineheight=1.2))
-    
-    
-    ggsave(temp_plot_volcano, file=paste0(disease,"_volcanoplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
     
     ###############Generate addiyional tables,lolliplot and hpo plot
   
@@ -620,10 +645,19 @@ if(plotting=="Y"){
       gene_test$hgvs_p_change <- sub("[(]","",gene_test$hgvs_p_change)
       gene_test$hgvs_p_change <- sub("[)]","",gene_test$hgvs_p_change)
 
-      #Load additional library for lolliplot
+      # Load additional library for lolliplot ----
+      if (! requireNamespace("httr", quietly = TRUE)) {
+        install.packages("httr")
+        loadNamespace("httr")
+      }
+      if (! requireNamespace("drawProteins", quietly = TRUE)) {
+        install.packages("drawProteins")
+        loadNamespace("drawProteins")
+      }
+
       library(httr)
       library(drawProteins)
-      
+
       #Retrieve protein info
       protein_id<-uniprot[uniprot$gene==sign_gene,'uniprotswissprot']
       protein_id_url<-gsub(" ","%2C",protein_id)
@@ -691,16 +725,29 @@ if(plotting=="Y"){
       
       print(paste0(nrow(fix_transcript)," variants to fix!"))
       
-      
       fix_transcript$fixed<-"Y"
       
-      library(ensembldb)
-      library(EnsDb.Hsapiens.v86)
-      
-      edb <- filter(EnsDb.Hsapiens.v86, filter = GeneNameFilter(sign_gene))
-      
-      
       if((nrow(fix_transcript)>0)==TRUE){
+        
+        # Load additional library for re-annotation ----
+        if (! requireNamespace("ensembldb", quietly = TRUE)) {
+          install.packages("ensembldb")
+          loadNamespace("ensembldb")
+        }
+        if (! requireNamespace("AnnotationHub", quietly = TRUE)) {
+          install.packages("AnnotationHub")
+          loadNamespace("AnnotationHub")
+        }
+        library(ensembldb)
+        library(AnnotationHub)
+        
+        AH <- AnnotationHub()
+        
+        query(AH, "Hsapiens.v109")
+        
+        edb <- AH[["AH109606"]]      
+        
+        edb <- filter(edb, filter = GeneNameFilter(sign_gene))
         
         
         for (k in 1:length(fix_transcript$gene)){
@@ -1018,9 +1065,6 @@ if(plotting=="Y"){
         scale_shape_manual(values=c('16'=16,'15'=15,'18'=18),labels=c('16'="het",'15'="hom",'18'="comp_het"),name="Genotypes")+
         geom_text_repel(nudge_y=0.2,color=ifelse(var.plot$freq>=1,"black","NA"),size=ifelse(var.plot$freq>=1,4,4),fontface="bold",max.overlaps = Inf)
       
-      
-      p
-      
       #Extract and include additional protein annotation
       features_total_plot<-features_total_plot %>% ungroup()
       
@@ -1051,9 +1095,9 @@ if(plotting=="Y"){
         labs(y="Mutation frequency in our dataset",title=paste0(sign_gene," variants within the ", sign_analysis_label_read, " cohort"),subtitle=paste0(gene_info$description,"\nprotein structure source: Uniprot(",uniprot$uniprotswissprot,")","\ntranscript: ",select_transcript))+
         scale_y_continuous(breaks=seq(0,max(var.plot$freq),1),name="frequency")
       
-      p	
       
       ggsave(p, file=paste0(getwd(),"/",sign_gene_test,"_lolliplot_",disease,".png"),width = 20, height = 5, units="in")
+      print(paste0(sign_gene_test,"_lolliplot_",disease,".png saved!"))
       
       
       #Save lolliplot table
@@ -1074,9 +1118,21 @@ if(plotting=="Y"){
       
       var_allvariant_plot<-var_allvariant_plot[!duplicated(var_allvariant_plot[,c('sample.id')]),]
       
-      library(ontologyIndex)
+      # Load additional library for HPO analysis ----
+      if (! requireNamespace("ontologyIndex", quietly = TRUE)) {
+        install.packages("ontologyIndex")
+        loadNamespace("ontologyIndex")
+      }
+      if (! requireNamespace("ontologyPlot", quietly = TRUE)) {
+        install.packages("ontologyPlot")
+        loadNamespace("ontologyPlot")
+      }
       
-      hpo <- get_ontology("/re_gecip/enhanced_interpretation/lvestito/cohorts/Data/hp_new.obo",extract_tags = "everything")
+      library(ontologyIndex)
+      library(ontologyPlot)
+      
+      
+      hpo <- get_ontology("http://purl.obolibrary.org/obo/hp.obo")
       
       ## hpo ids and descriptions
       
@@ -1084,19 +1140,18 @@ if(plotting=="Y"){
                                     hpo.description=as.character(as.data.frame(hpo[[2]])[,1]),stringsAsFactors = F)
       
       
-      HPO_case_cohort_unique<-data.frame(table(unlist(strsplit(na.omit(unlist(as.character(var_allvariant_plot$hpo.ids))), "\\|"))))
+      HPO_case_cohort_unique<-data.frame(table(unlist(strsplit(na.omit(unlist(as.character(var_allvariant_plot$hpo.ids))), ","))))
       HPO_case_cohort_unique$hpo.description<-hpo.description$hpo.description[match(HPO_case_cohort_unique$Var1,hpo.description$hpo.term)]
       HPO_case_cohort_unique$Var1<-as.character(HPO_case_cohort_unique$Var1)
       HPO_case_cohort_unique<-HPO_case_cohort_unique %>% dplyr::arrange(desc(Freq)) 
-      write.table(HPO_case_cohort_unique,paste0("./",sign_gene,"_hpo_table_cases.tsv"), quote = F,sep="\t",row.names = FALSE)
+      write.table(HPO_case_cohort_unique,paste0("./",sign_gene_test,"_hpo_table_cases.tsv"), quote = F,sep="\t",row.names = FALSE)
+      print(paste0(sign_gene_test,"_hpo_table_cases.tsv written!"))
       
       
       list_hpo_patient<- list()
       for(patient in 1:length(var_allvariant_plot$sample.id)){
-        print(patient)
         hpo_terms<-var_allvariant_plot %>% dplyr::slice(patient)
-        print(hpo_terms$sample.id)
-        hpo_terms<-data.frame(table(unlist(strsplit(na.omit(unlist(as.character(hpo_terms$hpo.ids))), "\\|"))))
+        hpo_terms<-data.frame(table(unlist(strsplit(na.omit(unlist(as.character(hpo_terms$hpo.ids))), ","))))
         hpo_terms<-as.vector(hpo_terms$Var1)
         list_hpo_patient[[paste0("patient_",patient)]] <- hpo_terms
       }
@@ -1130,9 +1185,6 @@ if(plotting=="Y"){
         node.colours
       }
       
-      library(ontologyPlot)
-      
-      
       if(nrow(var_allvariant_plot)>1 & nrow(var_allvariant_plot)<4){
         
         
@@ -1144,8 +1196,8 @@ if(plotting=="Y"){
         hpo_plot
         
         #write_dot(hpo_plot,file=paste0("hpo_plot_",i))
-        
-        png(paste0("hpo_plot_freq_",sign_gene,"_cases.png"), width = 2400, height =1200) 
+        print(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png saved!"))
+        png(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png"), width = 2400, height =1200) 
         plot(hpo_plot)
         dev.off()
         
@@ -1164,8 +1216,8 @@ if(plotting=="Y"){
         hpo_plot
         
         #write_dot(hpo_plot,file=paste0("hpo_plot_",i))
-        
-        png(paste0("hpo_plot_freq_",sign_gene,"_cases.png"), width = 2400, height =1200) 
+        print(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png saved!"))
+        png(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png"), width = 2400, height =1200) 
         plot(hpo_plot)
         dev.off()
         
@@ -1183,7 +1235,8 @@ if(plotting=="Y"){
         
         #write_dot(hpo_plot,file=paste0("hpo_plot_",i))
         
-        png(paste0("hpo_plot_freq_",sign_gene,"_cases.png"), width = 2400, height =1200) 
+        print(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png saved!"))
+        png(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png"), width = 2400, height =1200) 
         plot(hpo_plot)
         dev.off()
         
@@ -1202,7 +1255,8 @@ if(plotting=="Y"){
         
         #write_dot(hpo_plot,file=paste0("hpo_plot_",i))
         
-        png(paste0("hpo_plot_freq_",sign_gene,"_cases.png"), width = 2400, height =1200) 
+        print(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png saved!"))
+        png(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png"), width = 2400, height =1200) 
         plot(hpo_plot)
         dev.off()
         
@@ -1219,7 +1273,8 @@ if(plotting=="Y"){
         
         #write_dot(hpo_plot,file=paste0("hpo_plot_",i))
         
-        png(paste0("hpo_plot_freq_",sign_gene,"_cases.png"), width = 2400, height =1200) 
+        print(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png saved!"))
+        png(paste0("hpo_plot_freq_",sign_gene_test,"_cases.png"), width = 2400, height =1200) 
         plot(hpo_plot)
         dev.off()
         
@@ -1370,3 +1425,10 @@ if(plotting=="Y"){
       }
     }
 
+
+# Clean ====
+if (runMode == "local-inter") {
+  cat("\014")
+}
+
+rm(list = ls())
