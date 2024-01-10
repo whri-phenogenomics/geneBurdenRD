@@ -20,3 +20,10 @@ module load lang/R/4.1.0-foss-2019b
 # args[5]. choice "plot" or "table_only" default is "plot"
 
 Rscript /geneBurdenRD/scripts/geneBurdenRD_visualisation_jobarray.R 'LSB_JOBINDEX' "data/exomiser_master_file_passvars.tsv" "data/analysisLabelList.tsv" "0.05" "plot"
+
+# To run this script:
+
+# 1. Uncomment: runMode <- "cluster" in geneBurdenRD_visualisation_jobarray.R
+# 2. ssh cluster
+# 3. /geneBurdenRD/scripts/geneBurdenRD_visualisation_jobarray.sh
+# 4. bjobs 
