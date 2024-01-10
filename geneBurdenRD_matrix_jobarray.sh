@@ -2,7 +2,7 @@
 #BSUB -P re_gecip_enhanced_interpretation
 #BSUB -o cluster/geneBurdenRD_matrix_jobarray_%J_%I.stdout
 #BSUB -e cluster/geneBurdenRD_matrix_jobarray_%J_%I.stderr
-#BSUB -cwd /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD
+#BSUB -cwd /geneBurdenRD
 #BSUB -n 5
 #BSUB -J geneBurdenRD_matrix_jobarray[1-226]
 #BSUB -R rusage[mem=80000]
@@ -18,11 +18,11 @@ module load lang/R/4.1.0-foss-2019b
 # One optional argument
 # args[4]. whether gene list files are provided: "geneListFileON"
 
-Rscript /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
+Rscript /geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
 
 # To run this script:
 
 # 1. Uncomment: runMode <- "cluster" in geneBurdenRD_matrix_jobarray.R
 # 2. ssh cluster
-# 3. bsub < /re_gecip/enhanced_interpretation/vcipriani/geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.sh
+# 3. bsub < /geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.sh
 # 4. bjobs
