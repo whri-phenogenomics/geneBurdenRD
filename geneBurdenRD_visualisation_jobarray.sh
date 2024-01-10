@@ -13,7 +13,10 @@ module load lang/R/4.1.0-foss-2019b
 # Specify 3 mandatory R arguments in quotes:
 # args[1]. job index: e.g. 'LSB_JOBINDEX'
 # args[2]. path for Exomiser masterfile file: e.g. "data/exomiser_master_file_passvars.tsv"
+# (path relative to cwd; otherwise, absolute path; in quotes) e.g. "data/exomiser_master_file_passvars.tsv"
 # args[3]. path for file containing list of case-control analysis labels: e.g. "data/analysisLabelList.tsv"
+# (path relative to cwd; otherwise, absolute path; in quotes) e.g. "data/analysisLabelList.tsv"
+
 
 # One optional argument
 # args[4]. choice of FDR threshold: "0.01" default is "0.05"
