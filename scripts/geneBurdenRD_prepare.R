@@ -15,11 +15,11 @@ library("data.table")
 
 if (runMode == "local-inter") {
 
-  exomiserCandidatesFile <- "~/re_gecip/enhanced_interpretation/dsmedley/exomiser_master_file_final.tsv" # <--- output file from Damian's pipeline; user-provided path
+  exomiserCandidatesFile <- "data/exomiser_master_file_passvars.tsv" # <--- output file from Damian's pipeline; user-provided path
   
 } else {
 
-  exomiserCandidatesFile <- args[1] # e.g. "/re_gecip/enhanced_interpretation/dsmedley/exomiser_master_file_final.tsv"
+  exomiserCandidatesFile <- args[1] # e.g. "data/exomiser_master_file_passvars.tsv"
   
 }
 
@@ -56,7 +56,6 @@ length(exomiserCandidates$sample.id %>%
          unique()
 )
 
-# Change name not to make too many changes in the exsiting version of the script when making it generic ----
 exomiserPass <- exomiserCandidates
 dim(exomiserPass)
 rm(exomiserCandidates)
