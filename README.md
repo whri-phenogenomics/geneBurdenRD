@@ -60,10 +60,10 @@ pvalue		    p-value after one-sided Fisher Exact test
 p.adjust.fdr	    p-value after false discovery rate (FDR) adjustment
 or	            odds ratio
 d	            number of cases with the event
-totcases	     total number of cases (b+d)
+totcases	    total number of cases (b+d)
 totcontrols         total number of controls (a+c)
 totgenestested	    total number of genes tested
-tottests	  total number of tests
+tottests	    total number of tests
 lowclor		     odds ratio lower confidence limit
 upclor 		     odds ratio upper confidence limit
 a	             number of controls without the event
