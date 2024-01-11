@@ -77,7 +77,7 @@ The output of the visualization script is explained below.
 
 The **_./plots_** folder includes individual subfolders for each analysis, each containing at least one significant signal.
 										
-Each analysis subfolder contains:											
+Each analysis subfolder contains:
 ► one **Manhattan-like plot** for the analysis: the x-axis is the chromosome position and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed line represents the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold. Please note that this visualisation is only available for genome-wide analysis.
 									
 ► one **volcano plot** for the specific disease: the x-axis is the log2 of the odds ratio and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed lines represent the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold and odds ratio >= 3.			
