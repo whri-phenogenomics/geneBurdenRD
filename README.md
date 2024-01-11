@@ -111,14 +111,14 @@ For better visualization clarity, please be aware that the limit for variants di
 
 ## Instructions for use
 Prepare your own versions of the input files (as below) and then run as described above for the example files.
-- **exomiser_master_file_passvars.tsv**  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
+1. **exomiser_master_file_passvars.tsv**  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
    
 ```perl
 perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de novo file> <optional CCR file> <optional assembly: b37 or b38 (default)>
 ```
-_ Samples file is the list of sampleIDs used to name Exomiser output files with the full path prefix if not in the current directory (one per line)
-_ De novo file is a tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants (one per line)
-_ CCR file contains constrained coding regions in chr:start-end format (one per line)
-- **analysisLabelList.tsv** is the list of analyses to be run. It requires two columns: analysis.label and analysis
-- **analysis.label.tsv** are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
+	_ Samples file is the list of sampleIDs used to name Exomiser output files with the full path prefix if not in the current directory (one per line)
+	_ De novo file is a tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants (one per line)
+	_ CCR file contains constrained coding regions in chr:start-end format (one per line)
+2. **analysisLabelList.tsv** is the list of analyses to be run. It requires two columns: analysis.label and analysis\
+3. **analysis.label.tsv** are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
 
