@@ -24,7 +24,7 @@ The R framework was tested using R/4.1.0.
 Non-standard hardware is not required but to analyse larger cohorts it is useful to have access to a large, high compute cluster to run as many jobs in parallel as possible and reduce the overall run-time.
 
 ## Installation guide
-Installation is from our GitHub repository, e.g. git clone [https://github.com/whri-phenogenomics/geneBurdenRD.git] or a download from [https://github.com/whri-phenogenomics/geneBurdenRD/tree/master#:~:text=Download-,ZIP]
+Installation is from our GitHub repository, e.g. git clone https://github.com/whri-phenogenomics/geneBurdenRD.git or a download from https://github.com/whri-phenogenomics/geneBurdenRD/tree/master#:~:text=Download-,ZIP
 
 As the installation involves simply cloning/downloading from a GitHub repo it only takes a matter of seconds on any computer.
 
