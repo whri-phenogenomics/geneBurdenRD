@@ -63,14 +63,14 @@ d	            number of cases with the event
 totcases	     total number of cases (b+d)
 totcontrols         total number of controls (a+c)
 totgenestested	    total number of genes tested
-tottests	total number of tests
+tottests	  total number of tests
 lowclor		     odds ratio lower confidence limit
 upclor 		     odds ratio upper confidence limit
 a	             number of controls without the event
 b	             number of cases without the event 
 c	             number of controls with the event 
 filename	     path to corresponding fisher.tsv file
-bonferroni.cutoff   Bonferroni correction
+bonferroni.cutoff    Bonferroni correction
 ```
 
 The output of the visualization script is explained below.
