@@ -30,11 +30,11 @@ As the installation involves simply cloning/downloading from a GitHub repo it on
 
 ## Demo
 The installation comes with the following example data:
-example exomiser_master_file_passvars.tsv file that can be used as input to the main R analysis. This file contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala) variant that causes Pfeiffer syndrome and the annotated Brachydactyly, Craniosynostosis, Broad thumb, Broad hallux HPO terms along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this FGFR2 variant.
+example **exomiser_master_file_passvars.tsv** file that can be used as input to the main R analysis. This file contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant.
 
-analysisLabelList.tsv contains a header row (analysis.label, analysis), followed by rows that specify a code representing the tested disease (e.g., PFFS) and an explanation for the disease tested (e.g., Pfeiffer syndrome).
+**analysisLabelList.tsv** contains a header row (analysis.label, analysis), followed by rows that specify a code representing the tested disease (e.g., PFFS) and an explanation for the disease tested (e.g., Pfeiffer syndrome).
 
-PFFS.tsv contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_10 with a 0 in the caco column to indicate controls.
+**PFFS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_10 with a 0 in the caco column to indicate controls.
 
 ### How to run the analysis on the demo data
 
@@ -74,5 +74,16 @@ bonferroni.cutoff   Bonferroni correction
 ```
 
 The output of the visualization script is explained below.
+
+The **_./plots_** folder includes individual subfolders for each analysis, each containing at least one significant signal.
+										
+Each analysis subfolder contains:											
+► one **Manhattan-like plot** for the analysis: the x-axis is the chromosome position and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed line represents the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold. Please note that this visualisation is only available for genome-wide analysis.
+									
+► one **volcano plot** for the specific disease: the x-axis is the log2 of the odds ratio and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed lines represent the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold and odds ratio >= 3.			
+
+► one subfolder per each significant gene-test: * please note that the null hypothesis tested are LoF, zero80 (Exomiser variant score>=0.8), denovo or CCR (constrained coding regions). 
+
+Each gene-test subfolder contains:
 
 
