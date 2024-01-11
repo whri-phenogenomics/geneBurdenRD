@@ -40,7 +40,7 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 
 git clone or download zip geneBurdenRD as described above
 
-```bash
+```
 cd geneBurdenRD
 sh scripts/geneBurdenRD_prepare.sh
 sh scripts/geneBurdenRD_matrix_jobarray.sh
