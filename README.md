@@ -55,9 +55,9 @@ The ./results folder includes the geneBurdenRD FDR tsv file which provides a sum
 analysis.label      code representing the tested disease
 analysis            explanation for the disease tested
 gene	            Exomiser gene
-test	              null hypothesis tested (LoF, zero80, denovo or CCR)
-pvalue		          p-value after one-sided Fisher Exact test
-p.adjust.fdr	      p-value after false discovery rate (FDR) adjustment
+test	            null hypothesis tested (LoF, zero80, denovo or CCR)
+pvalue		     p-value after one-sided Fisher Exact test
+p.adjust.fdr	    p-value after false discovery rate (FDR) adjustment
 or	                odds ratio
 d	                  number of cases with the event
 totcases	          total number of cases (b+d)
