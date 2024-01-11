@@ -18,7 +18,7 @@ module load lang/R/4.1.0-foss-2019b
 # One optional argument
 # args[4]. whether gene list files are provided: "geneListFileON"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
+Rscript scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
 
 # To run this script:
 
