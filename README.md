@@ -51,7 +51,7 @@ sh geneBurdenRD_visualisation_jobarray.sh
 ### Expected output:
 
 The ./results folder includes the geneBurdenRD FDR tsv file which provides a summary of statistics for all signals and includes:
-
+```
 analysis.label      code representing the tested disease
 analysis            explanation for the disease tested
 gene	              Exomiser gene
@@ -71,6 +71,7 @@ b	                  number of cases without the event
 c	                  number of controls with the event 
 filename	          path to corresponding fisher.tsv file
 bonferroni.cutoff 	Bonferroni correction
+```
 
 The output of the visualization script is explained below.
 
