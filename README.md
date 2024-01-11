@@ -101,8 +101,24 @@ protein.change	   protein change annotated on the selected transcript
 fixed	           Y if the variant needed to be re-annotated to the selected transcript								
 var.aanum 	   amino acid number on lolliplot	
 ```
-For better visualization clarity, please be aware that the limit for variants displayed in the lolliplots has been set to 100.	
-			
+For better visualization clarity, please be aware that the limit for variants displayed in the lolliplots has been set to 100.
+		
 ► one **HPO plot** showing all the HPO terms and their common ancestor terms found in cases using the fake patient ID in the lolliplot tsv table. The colour of the HPO node indicates the frequency of their shared clinical features. * if the HPO plot is too busy due to many cases with variable phenotype please refer to the HPO table or the “hpo” column in the variant or lolliplot tsv tables			
 							
 ► one **HPO tsv** table: table with tabulation of all the HPO terms found in cases and their frequency	
+
+► one **variants tsv** table containing all Exomiser variants in that gene including cases, controls, excluded and variants not contributing to the gene-test significance. * please note that some variants might match the different mode of inheritance. 
+
+## Instructions for use
+Prepare your own versions of the input files (as below) and then run as described above for the example files.
+1. exomiser_master_file_passvars.tsv  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
+   
+```perl
+perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de novo file> <optional CCR file> <optional assembly: b37 or b38 (default)>
+```
+Samples file is the list of sampleIDs used to name Exomiser output files with the full path prefix if not in the current directory (one per line)
+De novo file is a tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants (one per line)
+CCR file contains constrained coding regions in chr:start-end format (one per line)
+2. analysisLabelList.tsv is the list of analyses to be run. It requires two columns: analysis.label and analysis
+3. analysis.label.tsv are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
+
