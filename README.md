@@ -3,7 +3,7 @@
 
 ## System requirements
 ### Software dependencies and operating systems
-The R framework only demands the presence of R or Rstudio and a standard computer with sufficient RAM to accommodate in-memory operations. The following R packages will need to be installed (if not already) via install.packages(‘packageName’) from R:
+The R framework only demands the presence of R or Rstudio and a standard computer with sufficient RAM to accommodate in-memory operations. The following R packages will need to be installed (if not already) via install.packages(‘packageName’) from R or install.packages("BiocManager") and BiocManager::install("biomaRt") for the biomaRt, ensembldb, drawProteins and AnnotationHub Bioconductor packages:
 
 ```R
 library("tidyverse") 
