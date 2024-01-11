@@ -124,4 +124,4 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 3. **analysis.label.tsv** are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
 
 
-![flowchart](https://github.com/letiziavestito/Figure/blob/361ddc04baca9729be58d21af5ff8badb1912945/geneBurdenRD_GitHub_flowchart.png | width="200" height="400")
+![flowchart](https://github.com/letiziavestito/Figure/blob/361ddc04baca9729be58d21af5ff8badb1912945/geneBurdenRD_GitHub_flowchart.png)
