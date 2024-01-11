@@ -41,11 +41,11 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 git clone or download zip geneBurdenRD as described above
 
 ```bash
-sh geneBurdenRD_prepare.sh
-sh geneBurdenRD_matrix_jobarray.sh
-sh geneBurdenRD_fisher_jobarray.sh
-sh geneBurdenRD_padjust.sh
-sh geneBurdenRD_visualisation_jobarray.sh
+sh scripts/geneBurdenRD_prepare.sh
+sh scripts/geneBurdenRD_matrix_jobarray.sh
+sh scrips/geneBurdenRD_fisher_jobarray.sh
+sh scripts/geneBurdenRD_padjust.sh
+sh scripts/geneBurdenRD_visualisation_jobarray.sh
 ```
 
 ### Expected output:
