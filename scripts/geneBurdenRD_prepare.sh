@@ -15,7 +15,7 @@ module load lang/R/4.1.0-foss-2019b
 # arg[2]. path for final output file which will be the input data file for matrix script: 
 # (path relative to cwd; otherwise, absolute path; in quotes) e.g. "data/exomiserPassWide.tsv"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_prepare.R "data/exomiser_master_file_passvars.tsv" "data/exomiserPassWide.tsv"
+Rscript scripts/geneBurdenRD_prepare.R "data/exomiser_master_file_passvars.tsv" "data/exomiserPassWide.tsv"
 
 # To run this script:
 

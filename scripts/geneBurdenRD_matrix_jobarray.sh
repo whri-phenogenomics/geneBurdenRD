@@ -4,7 +4,7 @@
 #BSUB -e cluster/geneBurdenRD_matrix_jobarray_%J_%I.stderr
 #BSUB -cwd /geneBurdenRD
 #BSUB -n 5
-#BSUB -J geneBurdenRD_matrix_jobarray[1-226]
+#BSUB -J geneBurdenRD_matrix_jobarray[1]
 #BSUB -R rusage[mem=80000]
 #BSUB -M 80000
 
@@ -18,7 +18,7 @@ module load lang/R/4.1.0-foss-2019b
 # One optional argument
 # args[4]. whether gene list files are provided: "geneListFileON"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
+Rscript scripts/geneBurdenRD_matrix_jobarray.R 'LSB_JOBINDEX' "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv" 
 
 # To run this script:
 
