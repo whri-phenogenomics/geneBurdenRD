@@ -48,4 +48,30 @@ sh geneBurdenRD_padjust.sh
 sh geneBurdenRD_visualisation_jobarray.sh
 ```
 
+### Expected output:
+
+The ./results folder includes the geneBurdenRD FDR tsv file which provides a summary of statistics for all signals and includes:
+
+analysis.label      code representing the tested disease
+analysis            explanation for the disease tested
+gene	              Exomiser gene
+test	              null hypothesis tested (LoF, zero80, denovo or CCR)
+pvalue		          p-value after one-sided Fisher Exact test
+p.adjust.fdr	      p-value after false discovery rate (FDR) adjustment
+or	                odds ratio
+d	                  number of cases with the event
+totcases	          total number of cases (b+d)
+totcontrols         total number of controls (a+c)
+totgenestested	    total number of genes tested
+tottests		        total number of tests
+lowclor		          odds ratio lower confidence limit
+upclor 		          odds ratio upper confidence limit
+a	                  number of controls without the event
+b	                  number of cases without the event 
+c	                  number of controls with the event 
+filename	          path to corresponding fisher.tsv file
+bonferroni.cutoff 	Bonferroni correction
+
+The output of the visualization script is explained below.
+
 
