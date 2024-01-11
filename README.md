@@ -101,7 +101,7 @@ protein.change	   protein change annotated on the selected transcript
 fixed	           Y if the variant needed to be re-annotated to the selected transcript								
 var.aanum 	   amino acid number on lolliplot	
 ```
-For better visualization clarity, please be aware that the limit for variants displayed in the lolliplots has been set to 100.
+For better visualization clarity, please notice that the limit for variants displayed in the lolliplots has been set to 100.
 		
 ► one **HPO plot** showing all the HPO terms and their common ancestor terms found in cases using the fake patient ID in the lolliplot tsv table. The colour of the HPO node indicates the frequency of their shared clinical features. * if the HPO plot is too busy due to many cases with variable phenotype please refer to the HPO table or the “hpo” column in the variant or lolliplot tsv tables			
 							
