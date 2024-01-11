@@ -22,7 +22,7 @@ module load lang/R/4.1.0-foss-2019b
 # args[4]. choice of FDR threshold: "0.01" - default is "0.05"
 # args[5]. choice "plot" or "table_only" - default is "plot"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_visualisation_jobarray.R 'LSB_JOBINDEX' "data/exomiser_master_file_passvars.tsv" "data/analysisLabelList.tsv" "0.05" "plot"
+Rscript scripts/geneBurdenRD_visualisation_jobarray.R 'LSB_JOBINDEX' "data/exomiser_master_file_passvars.tsv" "data/analysisLabelList.tsv" "0.05" "plot"
 
 # To run this script:
 

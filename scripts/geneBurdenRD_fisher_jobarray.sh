@@ -4,7 +4,7 @@
 #BSUB -e cluster/geneBurdenRD_fisher_jobarray_%J_%I.stderr
 #BSUB -cwd /geneBurdenRD
 #BSUB -n 2 
-#BSUB -J geneBurdenRD_fisher_jobarray[1-226]
+#BSUB -J geneBurdenRD_fisher_jobarray[1]
 #BSUB -R rusage[mem=10000]
 #BSUB -M 10000
 
@@ -14,7 +14,7 @@ module load lang/R/4.1.0-foss-2019b
 # args[1]. job index: e.g. 'LSB_JOBINDEX'
 # arg[2]. path for file containing list of case-control analysis labels: e.g. "data/analysisLabelList.tsv"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_fisher_jobarray.R 'LSB_JOBINDEX' "data/analysisLabelList.tsv"
+Rscript scripts/geneBurdenRD_fisher_jobarray.R 'LSB_JOBINDEX' "data/analysisLabelList.tsv"
 
 # To run this script:
 
