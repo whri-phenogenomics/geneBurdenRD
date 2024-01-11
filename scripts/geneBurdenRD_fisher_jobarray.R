@@ -36,13 +36,33 @@ dir.create(file.path("./output/", fisher), showWarnings = FALSE)
 cluster <- "cluster"
 dir.create(file.path("./", cluster), showWarnings = FALSE)
 
-analysisLabelListFile <- args[2]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
+
+if (runMode == "local-inter") {
+  
+  analysisLabelListFile <- "data/analysisLabelList.tsv"
+  
+} else {
+  
+  analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
+  # analysisLabelList.tsv is a user-provided file: no-header, 1 column, containing no-spaced analysis labels (e.g. CVD) per each case-control analysis.
+  # This file is accompanied by corresponding user-provided case-control files named diseaseLabel.tsv (e.g. CVD.tsv) containing two columns as:
+  # sample.id and caco (0/1/NA) where 0 is control, 1 is case, NA missing disease status.
+  # The number of sample ids match the number of sample ids run on Exomiser
+  
+}
 
 # Get list of analysis labels ----
 analyses <- read_tsv(analysisLabelListFile)
 
 # Show number of analyses
 dim(analyses)
+
+# If analysisLabelListFile contains only one disease directly impose jobindex as 1
+if(nrow(analyses)==1){
+  
+  jobindex <- 1
+  
+}
 
 # Define analysis using the jobindex as # of analysis to test  ----
 analysis <- analyses[jobindex, ] %>% .[[1]]
