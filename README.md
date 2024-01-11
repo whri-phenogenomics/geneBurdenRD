@@ -125,5 +125,5 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 
 
 <p align="center">
-<img src="https://github.com/letiziavestito/Figure/blob/361ddc04baca9729be58d21af5ff8badb1912945/geneBurdenRD_GitHub_flowchart.png" width="700" height="1600">
+<img src="https://github.com/letiziavestito/Figure/blob/361ddc04baca9729be58d21af5ff8badb1912945/geneBurdenRD_GitHub_flowchart_grey.png" width="700" height="1600">
 </p>
