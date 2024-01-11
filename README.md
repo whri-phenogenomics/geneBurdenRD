@@ -111,7 +111,7 @@ For better visualization clarity, please be aware that the limit for variants di
 
 ## Instructions for use
 Prepare your own versions of the input files (as below) and then run as described above for the example files.
-1. exomiser_master_file_passvars.tsv  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
+- exomiser_master_file_passvars.tsv  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
    
 ```perl
 perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de novo file> <optional CCR file> <optional assembly: b37 or b38 (default)>
@@ -119,6 +119,6 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 Samples file is the list of sampleIDs used to name Exomiser output files with the full path prefix if not in the current directory (one per line)
 De novo file is a tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants (one per line)
 CCR file contains constrained coding regions in chr:start-end format (one per line)
-1. analysisLabelList.tsv is the list of analyses to be run. It requires two columns: analysis.label and analysis
-1. analysis.label.tsv are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
+- analysisLabelList.tsv is the list of analyses to be run. It requires two columns: analysis.label and analysis
+- analysis.label.tsv are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
 
