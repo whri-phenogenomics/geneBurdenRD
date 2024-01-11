@@ -92,7 +92,7 @@ Each gene-test subfolder contains:\
 ```
 Patient_ID	fake patient ID that can be used to interpret the “hpo_plot_freq.jpg”								
 gene.symbol	HGVS gene symbol
-hgvs_stranscript	HGVS transcript
+hgvs_transcript	HGVS transcript
 hgvs_c_change	HGVS c. change
 hgvs_p_change	HGVS p. change	
 genotype	genotype shown in the lolliplot (hom=homozygous or hemizygous, het=heterozygous, comp_het= compound heterozygous)								
