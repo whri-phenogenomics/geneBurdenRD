@@ -43,7 +43,7 @@ if (runMode == "local-inter") {
   
 } else {
   
-  analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
+  analysisLabelListFile <- args[2]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
   # analysisLabelList.tsv is a user-provided file: no-header, 1 column, containing no-spaced analysis labels (e.g. CVD) per each case-control analysis.
   # This file is accompanied by corresponding user-provided case-control files named diseaseLabel.tsv (e.g. CVD.tsv) containing two columns as:
   # sample.id and caco (0/1/NA) where 0 is control, 1 is case, NA missing disease status.
