@@ -12,7 +12,7 @@ module load lang/R/4.1.0-foss-2019b
 # Specify 1 mandatory R argument in quotes:
 # args[1]. project name (e.g. same name of project folder): "geneBurdenRD"
 
-Rscript /geneBurdenRD/scripts/geneBurdenRD_padjust.R "geneBurdenRD"
+Rscript scripts/geneBurdenRD_padjust.R "geneBurdenRD"
 
 # To run this script:
 
