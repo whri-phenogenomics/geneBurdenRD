@@ -184,6 +184,13 @@ if (runMode == "local-inter") {
   
 }
 
+# If analysisLabelListFile contains only one disease directly impose jobindex as 1
+if(nrow(analyses)==1){
+  
+  jobindex <- 1
+  
+}
+
 disease <- analyses[jobindex, ] %>% .[[1]]
 
 #Stop analysis if disease label has no significant signals
