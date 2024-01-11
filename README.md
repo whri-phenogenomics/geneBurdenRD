@@ -3,7 +3,6 @@
 
 ![flowchart](https://raw.githubusercontent.com/letiziavestito/Figure/geneBurdenRD_GitHub_flowchart.png)
 
-
 ## System requirements
 ### Software dependencies and operating systems
 The R framework only demands the presence of R or Rstudio and a standard computer with sufficient RAM to accommodate in-memory operations. The following R packages will need to be installed (if not already) via install.packages(‘packageName’) from R:
