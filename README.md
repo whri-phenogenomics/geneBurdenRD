@@ -38,10 +38,10 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 
 ### How to run the analysis on the demo data
 
-git clone or download zip geneBurdenRD as described above\
-cd to the **geneBurdenRD** folder
+git clone or download zip geneBurdenRD as described above
 
 ```bash
+cd geneBurdenRD
 sh scripts/geneBurdenRD_prepare.sh
 sh scripts/geneBurdenRD_matrix_jobarray.sh
 sh scripts/geneBurdenRD_fisher_jobarray.sh
