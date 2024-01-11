@@ -50,7 +50,7 @@ sh geneBurdenRD_visualisation_jobarray.sh
 
 ### Expected output:
 
-The ./results folder includes the geneBurdenRD FDR tsv file which provides a summary of statistics for all signals and includes:
+The **_./results_** folder includes the geneBurdenRD FDR tsv file, which provides a summary of statistics for all signals and includes:
 ```
 analysis.label      code representing the tested disease
 analysis            explanation for the disease tested
