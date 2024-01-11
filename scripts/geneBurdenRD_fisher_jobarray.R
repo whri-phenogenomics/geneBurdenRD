@@ -44,6 +44,13 @@ analyses <- read_tsv(analysisLabelListFile)
 # Show number of analyses
 dim(analyses)
 
+# If analysisLabelListFile contains only one disease directly impose jobindex as 1
+if(nrow(analyses)==1){
+  
+  jobindex <- 1
+  
+}
+
 # Define analysis using the jobindex as # of analysis to test  ----
 analysis <- analyses[jobindex, ] %>% .[[1]]
 analysis
