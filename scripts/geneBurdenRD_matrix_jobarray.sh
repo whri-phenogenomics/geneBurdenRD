@@ -4,7 +4,7 @@
 #BSUB -e cluster/geneBurdenRD_matrix_jobarray_%J_%I.stderr
 #BSUB -cwd /geneBurdenRD
 #BSUB -n 5
-#BSUB -J geneBurdenRD_matrix_jobarray[1-226]
+#BSUB -J geneBurdenRD_matrix_jobarray[1]
 #BSUB -R rusage[mem=80000]
 #BSUB -M 80000
 
