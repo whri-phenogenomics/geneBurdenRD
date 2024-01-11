@@ -96,7 +96,7 @@ hgvs_transcript	HGVS transcript
 hgvs_c_change	HGVS c. change
 hgvs_p_change	HGVS p. change	
 genotype	genotype shown in the lolliplot (hom=homozygous or hemizygous, het=heterozygous, comp_het= compound heterozygous)								
-select_transcript	transcript selected for the lolliplot								
+select_transcript  transcript selected for the lolliplot								
 protein.change	protein change annotated on the selected transcript								
 fixed	Y if the variant needed to be re-annotated to the selected transcript								
 var.aanum 	amino acid number on lolliplot	
