@@ -90,15 +90,15 @@ Each gene-test subfolder contains:\
 ► one **lolliplot tsv** table: it contains one row per each variant in the lolliplot found in cases and excluded probands and gives additional information about each variant. It includes all the columns described below for the tsv variant file * compared to the tsv variant file the lolliplot tsv file has some additional columns listed below :
 
 ```
-Patient_ID	fake patient ID that can be used to interpret the “hpo_plot_freq.jpg”								
-gene.symbol	HGVS gene symbol
-hgvs_transcript	HGVS transcript
-hgvs_c_change	HGVS c. change
-hgvs_p_change	HGVS p. change	
-genotype	genotype shown in the lolliplot (hom=homozygous or hemizygous, het=heterozygous, comp_het= compound heterozygous)								
+Patient_ID	   fake patient ID that can be used to interpret the “hpo_plot_freq.jpg”								
+gene.symbol	   HGVS gene symbol
+hgvs_transcript	   HGVS transcript
+hgvs_c_change	   HGVS c. change
+hgvs_p_change	   HGVS p. change	
+genotype	   genotype shown in the lolliplot (hom=homozygous or hemizygous, het=heterozygous, comp_het= compound heterozygous)								
 select_transcript  transcript selected for the lolliplot								
-protein.change	protein change annotated on the selected transcript								
-fixed	Y if the variant needed to be re-annotated to the selected transcript								
-var.aanum 	amino acid number on lolliplot	
+protein.change	   protein change annotated on the selected transcript								
+fixed	           Y if the variant needed to be re-annotated to the selected transcript								
+var.aanum 	   amino acid number on lolliplot	
 ```
 
