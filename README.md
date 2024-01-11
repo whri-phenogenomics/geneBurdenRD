@@ -49,6 +49,7 @@ sh scripts/geneBurdenRD_padjust.sh
 sh scripts/geneBurdenRD_visualisation_jobarray.sh
 
 ```
+Optionally, the R scripts can be run locally. To enable this functionality please uncomment the line runMode <- "local-inter" at the beginning of each respective R script.
 
 ### Expected output:
 
