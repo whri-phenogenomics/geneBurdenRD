@@ -87,5 +87,16 @@ Each analysis subfolder contains:\
 Each gene-test subfolder contains:\
 ► one **lolliplot** for each significant gene-test: the lolliplot shows the variants in the gene found in cases contributing to the gene burden signal for the specific test (in grey). Please note that lollies coloured in yellow show variants passing the gene-test that were eventually excluded from the analysis (caco == NA). The x-axis represents the amino acid chain and its annotated protein domain (Uniprot). Each lolly indicates a variant by its protein change annotated on one single transcript specified in the plot, the frequency of the variant in the contributing cases is shown on the y-axis. Its shape indicates the genotype found in the proband. The colour indicates the type of variant and the variant’s functional annotation. If the variants have both a p. change annotation and a number in parenthesis ( ) means that the original p. change was annotated on a different transcript and the amino acid position in parenthesis indicates the re-annotation on the selected transcript, if the only annotation available indicates a number in parenthesis ( ) it means that the variants were in the non-coding or splice region for that transcript, therefore the lolly was placed on the closest predicted amino acid. * Please be aware that the re-annotated non-coding or splice region variants provided are estimations of the nearest amino acid and should be verified for accuracy. For comprehensive details on all variants depicted in the lolliplot, refer to the lolliplot tsv table to retrieve the original information.
 
-► one **lolliplot tsv** table: it contains one row per each variant in the lolliplot found in cases and excluded probands and gives additional information about each variant. It includes all the columns described below for the tsv variant file * compared to the tsv variant file the lolliplot tsv file has some additional columns listed below :	
+► one **lolliplot tsv** table: it contains one row per each variant in the lolliplot found in cases and excluded probands and gives additional information about each variant. It includes all the columns described below for the tsv variant file * compared to the tsv variant file the lolliplot tsv file has some additional columns listed below :
+
+```
+Patient_ID	fake patient ID that can be used to interpret the “hpo_plot_freq.jpg”								
+gene.symbol, hgvs_stranscript, hgvs_c_change and hgvs_p_change	
+HGVS gene symbol, HGVS transcript, HGVS c. change and HGVS p. change								
+genotype	genotype shown in the lolliplot (hom=homozygous or hemizygous, het=heterozygous, comp_het= compound heterozygous)								
+select_transcript	transcript selected for the lolliplot								
+protein.change	protein change annotated on the selected transcript								
+fixed	Y if the variant needed to be re-annotated to the selected transcript								
+var.aanum 	amino acid number on lolliplot	
+```
 
