@@ -53,8 +53,18 @@ sh scripts/geneBurdenRD_visualisation_local.sh > local/geneBurdenRD_visualisatio
 ```
 To run the analysis on an HPC cluster:
 
-.sh scripts coming soon
+*_cluster.sh scripts coming soon!
 
+```
+cd geneBurdenRD
+mkdir cluster
+qsub scripts/geneBurdenRD_prepare_cluster.sh
+qsub scripts/geneBurdenRD_matrix_cluster.sh
+qsub scripts/geneBurdenRD_fisher_cluster.sh
+qsub scripts/geneBurdenRD_padjust_cluster.sh
+qsub scripts/geneBurdenRD_visualisation_cluster.sh
+
+```
 ### Expected output:
 
 The **_./results_** folder includes the geneBurdenRD FDR tsv file, which provides a summary of statistics for all signals and includes:
