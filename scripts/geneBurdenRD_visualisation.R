@@ -37,14 +37,9 @@ pval_DF<-read_tsv(file_to_read)
 
 #Chose p adjust FDR threshold to use either provided by user or default 0.05
 
-
-if (runMode == "cluster") {
-  
-  if(length(args)<3){
+if(length(args)<3){
     
     stop(print(paste("only ",length(args)," arguments provided, please provide [3] mandatory arguments")))
-    
-  }
 
 } 
 
