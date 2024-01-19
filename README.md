@@ -132,5 +132,5 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 
 
 <p align="center">
-<img src="https://github.com/letiziavestito/Figure/blob/d81ebb912560f0e3666295d6f4600b00c918f853/GB_flowchart_README_white.png" width="700" height="1600">
+<img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
 </p>
