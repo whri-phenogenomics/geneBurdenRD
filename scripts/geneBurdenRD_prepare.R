@@ -17,9 +17,6 @@ dir.create(file.path("./", plots), showWarnings = FALSE)
 output <- "output"
 dir.create(file.path("./", output), showWarnings = FALSE)
 
-cluster <- "cluster"
-dir.create(file.path("./", cluster), showWarnings = FALSE)
-
 data <- "data"
 dir.create(file.path("./", data), showWarnings = FALSE)
 

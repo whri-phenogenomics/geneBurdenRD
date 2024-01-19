@@ -20,9 +20,6 @@ dir.create(file.path("./", output), showWarnings = FALSE)
 fisher <- "fisher"
 dir.create(file.path("./output/", fisher), showWarnings = FALSE)
 
-cluster <- "cluster"
-dir.create(file.path("./", cluster), showWarnings = FALSE)
-
 analysisLabelListFile <- args[2]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
   # analysisLabelList.tsv is a user-provided file: no-header, 1 column, containing no-spaced analysis labels (e.g. CVD) per each case-control analysis.
   # This file is accompanied by corresponding user-provided case-control files named analysis.label.tsv (e.g. CVD.tsv) containing two columns as:

@@ -22,9 +22,6 @@ dir.create(file.path("./", output), showWarnings = FALSE)
 matrix <- "matrix"
 dir.create(file.path("./output/", matrix), showWarnings = FALSE)
 
-cluster <- "cluster"
-dir.create(file.path("./", cluster), showWarnings = FALSE)
-
 exomiserFile <- args[2]  # e.g. "data/exomiserPassWide.tsv" <--- either user-provided file, or output file from geneBurdenRD_prepare.R/.sh scripts
 
 analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file

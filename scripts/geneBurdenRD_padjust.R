@@ -11,9 +11,6 @@ args <- commandArgs(trailingOnly = TRUE)
 plots <- "plots"
 dir.create(file.path("./", plots), showWarnings = FALSE)
 
-cluster <- "cluster"
-dir.create(file.path("./", cluster), showWarnings = FALSE)
-
 results <- "results"
 dir.create(file.path("./", results), showWarnings = FALSE)
 
