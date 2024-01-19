@@ -51,10 +51,7 @@ sh scripts/geneBurdenRD_padjust_local.sh > local/geneBurdenRD_padjust.stdout 2> 
 sh scripts/geneBurdenRD_visualisation_local.sh > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
 
 ```
-To run the analysis on an HPC cluster:
-
-*_cluster.sh scripts coming soon!
-
+To run the analysis on an HPC cluster (standard error and standard output will be saved into 'cluster' folder):
 ```
 cd geneBurdenRD
 mkdir cluster
