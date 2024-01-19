@@ -10,7 +10,7 @@
 # args[5]. choice of "plot" or "table_only" - default is "plot"
 
 # Loop over all case-control analyses in "data/analysisLabelList.tsv"
-for I in (1..1}; do
+for I in {1..1}; do
 
    echo ${I}
    Rscript scripts/geneBurdenRD_visualisation.R ${I} "data/exomiser_master_file_passvars.tsv" "data/analysisLabelList.tsv" "0.05" "plot"

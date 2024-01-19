@@ -4,7 +4,7 @@
 # (path relative to cwd; otherwise, absolute path; in quotes)
 
 # Loop over all case-control analyses in "data/analysisLabelList.tsv"
-for I in (1..1}; do
+for I in {1..1}; do
 
    echo ${I}
    Rscript scripts/geneBurdenRD_fisher.R ${I} "data/analysisLabelList.tsv"

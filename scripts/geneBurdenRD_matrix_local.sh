@@ -9,7 +9,7 @@
 # args[4]. whether gene list files are provided: "geneListFileON"
 
 # Loop over all case-control analyses in "data/analysisLabelList.tsv"
-for I in (1..1}; do
+for I in {1..1}; do
 
    echo ${I}
    Rscript scripts/geneBurdenRD_matrix.R ${I} "data/exomiserPassWide.tsv" "data/analysisLabelList.tsv"
@@ -17,5 +17,5 @@ for I in (1..1}; do
 done
 
 # To run this script locally, from 'geneBurdenRD' folder:
-# 'local' folder has been created before running scripts/geneBurdenRD_prepare_local.sh 
+# 'local' folder has been created before running scripts/geneBurdenRD_prepare_local.sh
 # sh scripts/geneBurdenRD_matrix_local.sh > local/geneBurdenRD_matrix.stdout 2> local/geneBurdenRD_matrix.stderr
