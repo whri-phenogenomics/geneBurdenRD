@@ -5,28 +5,14 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# Select runMode, either local-interactive or cluster ----
-#runMode <- "local-inter"
-runMode <- "cluster"
-
 # Load libraries ---- 
 library("tidyverse")
 library("data.table")
 library("reshape2")
 
-if (runMode == "local-inter") {
+# Get the jobindex ----
+jobindex <- as.numeric(args[1]) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
   
-  # Define the jobindex as # of analysis interactively (for example, jobindex <- 1 to select the first analysis) ----
-  jobindex <- 1
-  
-} else {
-
-  # Get the jobindex from cluster ----
-  # jobindex <- as.numeric(Sys.getenv('LSB_JOBINDEX')) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-  jobindex <- as.numeric(Sys.getenv(args[1])) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-  
-}
-
 plots <- "plots"
 dir.create(file.path("./", plots), showWarnings = FALSE)
 
@@ -39,31 +25,13 @@ dir.create(file.path("./output/", matrix), showWarnings = FALSE)
 cluster <- "cluster"
 dir.create(file.path("./", cluster), showWarnings = FALSE)
 
+exomiserFile <- args[2]  # e.g. "data/exomiserPassWide.tsv" <--- either user-provided file, or output file from geneBurdenRD_prepare.R/.sh scripts
 
-
-if (runMode == "local-inter") {
-  
-  exomiserFile <- "data/exomiserPassWide.tsv"
-  
-} else {
-  
-  exomiserFile <- args[2]  # e.g. "data/exomiserPassWide.tsv" <--- either user-provided file, or output file from geneBurdenRD_prepare.R/.sh scripts
-  
-}
-
-if (runMode == "local-inter") {
-  
-  analysisLabelListFile <- "data/analysisLabelList.tsv"
-  
-} else {
-  
-  analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
+analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
   # analysisLabelList.tsv is a user-provided file: no-header, 1 column, containing no-spaced analysis labels (e.g. CVD) per each case-control analysis.
-  # This file is accompanied by corresponding user-provided case-control files named diseaseLabel.tsv (e.g. CVD.tsv) containing two columns as:
+  # This file is accompanied by corresponding user-provided case-control files named analysis.label.tsv (e.g. CVD.tsv) containing two columns as:
   # sample.id and caco (0/1/NA) where 0 is control, 1 is case, NA missing disease status.
   # The number of sample ids match the number of sample ids run on Exomiser
-  
-}
 
 # Load exomiserPassWide dataset ---- 
 # This file is created in geneBurdenRD_prepare.R 
@@ -87,13 +55,6 @@ analyses <- read_tsv(analysisLabelListFile)
 
 # Show number of analyses
 dim(analyses)
-
-# If analysisLabelListFile contains only one disease directly impose jobindex as 1
-if(nrow(analyses)==1){
-  
-  jobindex <- 1
-  
-}
 
 # Define analysis using the jobindex as # of analysis to test  ----
 analysis <- analyses[jobindex, ] %>% .[[1]]
@@ -417,11 +378,6 @@ if (length(genes80) >= 1) {
       }
     }
   }
-}
-
-# Clean ====
-if (runMode == "local-inter") {
-  cat("\014")
 }
 
 rm(list = ls())

@@ -5,24 +5,12 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# Select runMode, either local-interactive (to test interactively) or cluster (to submit with corresponding .sh script on a cluster) ----
-#runMode <- "local-inter"
-runMode <- "cluster"
-
 # Load libraries ----
 library("tidyverse")
 library("data.table")
 
-if (runMode == "local-inter") {
-
-  exomiserCandidatesFile <- "data/exomiser_master_file_passvars.tsv" # <--- output file from Damian's pipeline; user-provided path
+exomiserCandidatesFile <- args[1] # e.g. "data/exomiser_master_file_passvars.tsv"
   
-} else {
-
-  exomiserCandidatesFile <- args[1] # e.g. "data/exomiser_master_file_passvars.tsv"
-  
-}
-
 plots <- "plots"
 dir.create(file.path("./", plots), showWarnings = FALSE)
 
@@ -37,8 +25,6 @@ dir.create(file.path("./", data), showWarnings = FALSE)
 
 # Read in Exomiser candidates file ----
 exomiserCandidates <- read_tsv(exomiserCandidatesFile) 
-# ℹ Use `spec()` to retrieve the full column specification for this data.
-# ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 attr(exomiserCandidates, "problems")
 
@@ -256,11 +242,6 @@ if ("max.denovo" %in% colnames(exomiserPassWide)) {
 colnames(exomiserPassWideToOutput)
 write_tsv(exomiserPassWideToOutput, args[2])
 print("Output PassWide.tsv file: completed")
-
-# Clean ====
-if (runMode == "local-inter") {
-  cat("\014")
-}
 
 rm(list = ls())
 

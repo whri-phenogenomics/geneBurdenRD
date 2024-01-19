@@ -5,24 +5,11 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# Select runMode, either local-interactive or cluster ----
-#runMode <- "local-inter"
-runMode <- "cluster"
-
 # Load libraries ---- 
 library("tidyverse")
 
-if (runMode == "local-inter") {
-  
-  # Define the jobindex as # of analysis interactively (for example, jobindex <- 1 to select the first analysis) ----
-  jobindex <- 1
-  
-} else {
-  
-  # Get the jobindex from LSB_JOBINDEX ----
-  jobindex <- as.numeric(Sys.getenv(args[1])) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-  
-}
+# Get the jobindex ----
+jobindex <- as.numeric(args[1]) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
 
 plots <- "plots"
 dir.create(file.path("./", plots), showWarnings = FALSE)
@@ -36,33 +23,17 @@ dir.create(file.path("./output/", fisher), showWarnings = FALSE)
 cluster <- "cluster"
 dir.create(file.path("./", cluster), showWarnings = FALSE)
 
-
-if (runMode == "local-inter") {
-  
-  analysisLabelListFile <- "data/analysisLabelList.tsv"
-  
-} else {
-  
-  analysisLabelListFile <- args[2]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
+analysisLabelListFile <- args[2]  # e.g. "data/analysisLabelList.tsv" <--- user-provided file
   # analysisLabelList.tsv is a user-provided file: no-header, 1 column, containing no-spaced analysis labels (e.g. CVD) per each case-control analysis.
-  # This file is accompanied by corresponding user-provided case-control files named diseaseLabel.tsv (e.g. CVD.tsv) containing two columns as:
+  # This file is accompanied by corresponding user-provided case-control files named analysis.label.tsv (e.g. CVD.tsv) containing two columns as:
   # sample.id and caco (0/1/NA) where 0 is control, 1 is case, NA missing disease status.
   # The number of sample ids match the number of sample ids run on Exomiser
-  
-}
 
 # Get list of analysis labels ----
 analyses <- read_tsv(analysisLabelListFile)
 
 # Show number of analyses
 dim(analyses)
-
-# If analysisLabelListFile contains only one disease directly impose jobindex as 1
-if(nrow(analyses)==1){
-  
-  jobindex <- 1
-  
-}
 
 # Define analysis using the jobindex as # of analysis to test  ----
 analysis <- analyses[jobindex, ] %>% .[[1]]
@@ -221,11 +192,6 @@ if (file.exists(analysismatrixFile) == TRUE ) {
   
   print(analysismatrixFile)
   print("This matrix file does NOT exist")
-}
-
-# Clean ====
-if (runMode == "local-inter") {
-  cat("\014")
 }
 
 rm(list = ls())

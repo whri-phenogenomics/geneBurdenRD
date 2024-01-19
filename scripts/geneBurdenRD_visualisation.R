@@ -7,10 +7,6 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# Select runMode, either local-interactive or cluster ----
-#runMode <- "local-inter"
-runMode <- "cluster"
-
 # Load libraries ----
 if (! requireNamespace("tidyverse", quietly = TRUE)) {
   install.packages("tidyverse")
@@ -71,16 +67,7 @@ if(length(args)>=4){
 sign_pval_DF<-pval_DF %>% filter(p.adjust.fdr<=p.adjust.fdr_threshold)
 
 #Retrieve additional information from your masterfile
-
-if (runMode == "local-inter") {
-  
-  exomiserFile <- "data/exomiser_master_file_passvars.tsv" # <--- output file from Damian's pipeline; user-provided path
-  
-} else {
-  
-  exomiserFile <- args[2] # e.g. "data/exomiser_master_file_passvars.tsv"
-  
-}
+exomiserFile <- args[2] # e.g. "data/exomiser_master_file_passvars.tsv"
 
 exomiser.extrainfo <- read_tsv(exomiserFile)
 
@@ -157,39 +144,11 @@ sign_analysis_label<-as.data.frame(table(sign_pval_DF$analysis.label))
 names(sign_analysis_label)[names(sign_analysis_label) == 'Var1'] <- 'analysis.label'
 
 #Load disease list
-
-if (runMode == "local-inter") {
-  
-  analysisLabelListFile <- "data/analysisLabelList.tsv" # <--- output file from Damian's pipeline; user-provided path
-  
-} else {
-  
-  analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv"
-  
-}
-
+analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv"
 analyses <- read_tsv(analysisLabelListFile)
 
-
-if (runMode == "local-inter") {
-  
-  # Define the jobindex as # of analysis interactively (for example, jobindex <- 1 to select the first analysis) ----
-  jobindex <- 1
-  
-} else {
-  
-  # Get the jobindex from cluster ----
-  # jobindex <- as.numeric(Sys.getenv('LSB_JOBINDEX')) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-  jobindex <- as.numeric(Sys.getenv(args[1])) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
-  
-}
-
-# If analysisLabelListFile contains only one disease directly impose jobindex as 1
-if(nrow(analyses)==1){
-  
-  jobindex <- 1
-  
-}
+# Get the jobindex ----
+jobindex <- as.numeric(args[1]) # <-- user-provided jobindex (e.g. LSB_JOBINDEX)
 
 disease <- analyses[jobindex, ] %>% .[[1]]
 
@@ -1431,11 +1390,5 @@ if(plotting=="Y"){
         }
       }
     }
-
-
-# Clean ====
-if (runMode == "local-inter") {
-  cat("\014")
-}
 
 rm(list = ls())
