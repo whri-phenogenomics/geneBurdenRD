@@ -316,7 +316,7 @@ if(plotting=="Y"){
     
     if(nrow(chromosomes)!=25){
       
-      print("Manhattan plot is only available on genome wide analysis")
+      print("Manhattan and volcano plots are only available for genome wide analysis")
       
     }else{
       
