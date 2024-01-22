@@ -38,7 +38,7 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 
 ### How to run the analysis on the demo data
 
-git clone or download zip geneBurdenRD as described above.
+git clone or download zip geneBurdenRD as described above.\
 Please create a folder to contain your standard error and standard output; in the example below, the folder is named 'local'.
 To run the analysis locally (as opposed to submitting the scripts to an HPC cluster):
 ```
