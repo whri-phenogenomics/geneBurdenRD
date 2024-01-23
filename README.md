@@ -51,8 +51,7 @@ sh scripts/geneBurdenRD_padjust_local.sh > local/geneBurdenRD_padjust.stdout 2> 
 sh scripts/geneBurdenRD_visualisation_local.sh > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
 
 ```
-When working with your own dataset, it's necessary to adapt the loop in the local shell script based on the number of diseases you intend to test.\
-For example, when analyzing three diseases from the analysisLabelList.tsv, modify the following loop structure in both the matrix, fisher and visualization local shell scripts:
+When working with your own dataset, it's necessary to adapt the loop in the local shell script based on the number of diseases you intend to test. For example, when analyzing three diseases from the analysisLabelList.tsv, modify the following loop structure in both the matrix, fisher and visualization local shell scripts:
 
 ```
 for I in {1..3}; do
