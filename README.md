@@ -43,7 +43,7 @@ cd into the 'geneBurdenRD' folder:
 ```
 cd geneBurdenRD
 ```
-Then create a folder to redirect your standard error and standard output; in the example below, this folder is named either 'local' or 'cluster', depending whether the analysis is run locally or on an HPC cluster.\
+Then create a folder to redirect your standard error and standard output; in the example below, this folder is named either 'local' or 'cluster', depending whether the analysis is run locally or on an HPC cluster.
 
 To run the analysis locally:
 ```
