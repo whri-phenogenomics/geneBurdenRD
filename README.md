@@ -39,10 +39,14 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 ### How to run the analysis on the demo data
 
 git clone or download zip geneBurdenRD as described above.\
-Please create a folder to contain your standard error and standard output; in the example below, this folder is named 'local'.\
-To run the analysis locally (as opposed to submitting the scripts to an HPC cluster):
+cd into the 'geneBurdenRD' folder:
 ```
 cd geneBurdenRD
+```
+Then create a folder to redirect your standard error and standard output; in the example below, this folder is named either 'local' or 'cluster', depending whether the analysis is run locally or on an HPC cluster.\
+
+To run the analysis locally:
+```
 mkdir local
 sh scripts/geneBurdenRD_prepare_local.sh > local/geneBurdenRD_prepare.stdout 2> local/geneBurdenRD_prepare.stderr
 sh scripts/geneBurdenRD_matrix_local.sh > local/geneBurdenRD_matrix.stdout 2> local/geneBurdenRD_matrix.stderr
@@ -51,16 +55,8 @@ sh scripts/geneBurdenRD_padjust_local.sh > local/geneBurdenRD_padjust.stdout 2> 
 sh scripts/geneBurdenRD_visualisation_local.sh > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
 
 ```
-When working with your own dataset, it's necessary to adapt the loop in the local shell script based on the number of diseases you intend to test. For example, when analyzing three diseases from the analysisLabelList.tsv, modify the following loop structure in the matrix, fisher and visualization local shell scripts:
-
+To run the analysis on an HPC cluster:
 ```
-for I in {1..3}; do
-```
-
-
-To run the analysis on an HPC cluster (standard error and standard output will be saved into 'cluster' folder):
-```
-cd geneBurdenRD
 mkdir cluster
 qsub scripts/geneBurdenRD_prepare_cluster.sh
 qsub scripts/geneBurdenRD_matrix_cluster.sh
@@ -69,6 +65,17 @@ qsub scripts/geneBurdenRD_padjust_cluster.sh
 qsub scripts/geneBurdenRD_visualisation_cluster.sh
 
 ```
+
+Please note that when working with your own dataset, it's necessary to edit the loop in some of the local shell scripts or the task id in the job arrays on the cluster based on the number of diseases you intend to test. For example, when analysing three diseases from the analysisLabelList.tsv, modify the following loop structure in the matrix, fisher and visualization local shell scripts:
+
+```
+for I in {1..3}; do
+```
+or the task id in the matrix, fisher and visualization cluster shell scripts:
+```
+#$ -t 1-3
+```
+
 ### Expected output:
 
 The **_./results_** folder includes the geneBurdenRD FDR tsv file, which provides a summary of statistics for all signals and includes:
