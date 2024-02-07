@@ -170,8 +170,8 @@ or the task id in the matrix, fisher and visualization cluster shell scripts:
 ## Contact us <a name="contact"></a>
 
 For any questions/feedback, please contact us at:
-v.cipriani@qmul.ac.uk (Dr Valentina Cipriani)
-l.vestito@qmul.ac.uk (Dr Letizia Vestito)
-d.smedley@qmul.ac.uk (Prof Damian Smedley)
+v.cipriani@qmul.ac.uk (Dr Valentina Cipriani) \
+l.vestito@qmul.ac.uk (Dr Letizia Vestito) \
+d.smedley@qmul.ac.uk (Prof Damian Smedley) \
 
-You can also report any issues to the GitHub repository by using the "Issues" feature here: https://github.com/whri-phenogenomics/geneBurdenRD/issues.
+You can also report any issues to the GitHub repository by using the "Issues" feature: https://github.com/whri-phenogenomics/geneBurdenRD/issues.
