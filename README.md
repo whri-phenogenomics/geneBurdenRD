@@ -7,6 +7,7 @@
    - [How to run the analysis on the demo data](#rundemo)
    - [Expected output from the demo data](#output)
 5. [How to run the analysis on user data](#instructions)
+6. [Contact us](#contact)
 
 ##  Overview <a name="overview"></a>
 **_geneBurdenRD_** is an open-source R analytical framework that allows users to perform gene burden testing of variants in user-defined cases versus controls from rare disease sequencing cohorts. The input to the framework is a file obtained from processing Exomiser output files for each of the cohort samples, a file containing a label for each case-control association analysis to perform within the cohort and a (set of) corresponding file(s) with user-defined identifiers and case/control assignment per each sample. Cases and controls in a cohort could be defined in many ways, including by recruited disease category, by specific phenotypic annotations or phenotypic clustering. The framework will then assess false discovery rate (FDR)-adjusted disease-gene associations where genes are tested for an enrichment in cases vs controls of rare, protein-coding, segregating variants that are either (i) predicted loss-of-function (LoF), (ii) highly predicted pathogenic (Exomiser variant score >= 0.8), (iii) highly predicted pathogenic and present in a constrained coding region (CCR; 13) or (iv) de novo (restricted to only trios or larger families where de novo calling was possible and provided by the user). As well as various output files annotating these case-control association tests, Manhattan and volcano plots are generated summarising the FDR-adjusted p-values of all the gene-based tests for each case-control association analysis, along with lollipop plots of the relevant variants in cases and controls and plots of the hierarchical distribution of the Human Phenotype Ontology (HPO) case annotations for individual disease-gene associations.
@@ -165,3 +166,12 @@ or the task id in the matrix, fisher and visualization cluster shell scripts:
 <p align="center">
 <img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
 </p>
+
+## Contact us <a name="contact"></a>
+
+For any questions/feedback, please contact us at:
+v.cipriani@qmul.ac.uk (Dr Valentina Cipriani)
+l.vestito@qmul.ac.uk (Dr Letizia Vestito)
+d.smedley@qmul.ac.uk (Prof Damian Smedley)
+
+You can also report any issues to the GitHub repository by using the "Issues" feature here: https://github.com/whri-phenogenomics/geneBurdenRD/issues.
