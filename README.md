@@ -169,7 +169,7 @@ or the task id in the matrix, fisher and visualization cluster shell scripts:
 
 ## Contact us <a name="contact"></a>
 
-For any questions/feedback, please contact us at:
+For any questions/feedback, please contact us at: \
 v.cipriani@qmul.ac.uk (Dr Valentina Cipriani) \
 l.vestito@qmul.ac.uk (Dr Letizia Vestito) \
 d.smedley@qmul.ac.uk (Prof Damian Smedley)
