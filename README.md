@@ -40,7 +40,8 @@ As the installation involves simply cloning/downloading from a GitHub repo it on
 
 ## Demo <a name="demo"></a>
 The installation comes with the following example data:
-example **exomiser_master_file_passvars.tsv** file that can be used as input to the main R analysis. This file contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant.
+
+**exomiser_master_file_passvars.tsv** contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant.
 
 **analysisLabelList.tsv** contains a header row (analysis.label, analysis), followed by rows that specify a string representing the tested disease (e.g., PFFS) and a description of the disease tested (e.g., Pfeiffer syndrome).
 
