@@ -1,11 +1,11 @@
 # Table of contents
 1. [Overview](#overview)
-2. [System requirements](#requirements) \
-  - [Software dependencies and operating systems](#dependencies)
+2. [System requirements](#requirements)
+- [Software dependencies and operating systems](#dependencies)
 3. [Installation guide](#installation)
-4. [Demo](#demo) \
-   - [How to run the analysis on the demo data](#rundemo) \
-   - [Expected output from the demo data](#output)
+4. [Demo](#demo)
+- [How to run the analysis on the demo data](#rundemo)
+- [Expected output from the demo data](#output)
 5. [How to run the analysis on user data](#instructions)
 
 ##  Overview <a name="overview"></a>
