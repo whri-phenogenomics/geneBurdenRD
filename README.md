@@ -7,7 +7,7 @@
    - [How to run the analysis on the demo data](#rundemo)
    - [Expected output from the demo data](#output)
 5. [How to run the analysis on user data](#instructions)
-6. [Flowchart of the analytical](#framework)
+6. [Flowchart of the analytical framework](#framework)
 7. [Contact us](#contact)
 
 ##  Overview <a name="overview"></a>
