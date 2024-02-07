@@ -77,19 +77,9 @@ qsub scripts/geneBurdenRD_visualisation_cluster.sh
 
 ```
 
-Please note that when working with your own dataset, it's necessary to edit the loop in some of the local shell scripts or the task id in the job arrays on the cluster based on the number of diseases you intend to test. For example, when analysing three diseases from the analysisLabelList.tsv, modify the following loop structure in the matrix, fisher and visualization local shell scripts:
-
-```
-for I in {1..3}; do
-```
-or the task id in the matrix, fisher and visualization cluster shell scripts:
-```
-#$ -t 1-3
-```
-
 ### Expected output <a name="output"></a>
 
-The **_./results_** folder includes the geneBurdenRD FDR tsv file, which provides a summary of statistics for all signals and includes:
+The **_./results_** folder includes the **geneBurdenRD_FDR.tsv** file which provides summary statistics for all signals and includes:
 ```
 analysis.label      string representing the tested disease
 analysis            description of the disease tested
@@ -162,6 +152,15 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 2. **analysisLabelList.tsv** is the list of analyses to be run. It requires two columns: analysis.label and analysis\
 3. **analysis.label.tsv** are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
 
+Please note that when working with your own data, it's necessary to edit the loop in some of the local shell scripts or the task id in the job arrays for the HPC cluster based on the number of diseases you intend to test. For example, when analysing three diseases from the analysisLabelList.tsv file, modify the following loop structure in the matrix, fisher and visualization local shell scripts:
+
+```
+for I in {1..3}; do
+```
+or the task id in the matrix, fisher and visualization cluster shell scripts:
+```
+#$ -t 1-3
+```
 
 <p align="center">
 <img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
