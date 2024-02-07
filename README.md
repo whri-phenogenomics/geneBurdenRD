@@ -139,7 +139,7 @@ For better visualization clarity, please notice that the limit for variants disp
 ► one **variants tsv** table containing all Exomiser variants in that gene including cases, controls, excluded and variants not contributing to the gene-test significance. * please note that some variants might match the different mode of inheritance.
 
 ## How to run the analysis on user data <a name="instructions"></a>
-Prepare your own versions of the input files (as below) and then run as described above for the example files.
+Prepare your own version of the input files (as below) and then run as described above for the demo data.
 1. **exomiser_master_file_passvars.tsv**  summarising the Exomiser variant output and proband data for each of the samples to be analysed in your cohort. This can be achieved by running:
 
 ```perl
