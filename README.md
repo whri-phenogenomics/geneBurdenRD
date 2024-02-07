@@ -1,8 +1,18 @@
-#  Overview
+# Table of contents
+1. [Overview](#overview)
+2. [System requirements](#requirements)
+    a. [Software dependencies and operating systems](#dependencies)
+3. [Installation guide](#installation)
+4. [Demo](#demo)
+   a. [How to run the analysis on the demo data](#rundemo)
+   a. [Expected output](#output) 
+
+
+##  Overview <a name="overview"></a>
 **_geneBurdenRD_** is an open-source R framework that allows users to perform gene burden testing of variants in user-defined cases versus controls from rare disease sequencing cohorts. The input to the framework is a file obtained from processing Exomiser output files for each of the cohort samples, a file containing a label for each case-control association analysis to perform within the cohort and a (set of) corresponding file(s) with user-defined identifiers and case/control assignment per each sample. Cases and controls in a cohort could be defined in many ways, for example, by recruited disease category as we have done for the 100KGP analysis below, by specific phenotypic annotations or phenotypic clustering. The framework will then assess false discovery rate (FDR)-adjusted disease-gene associations where genes are tested for an enrichment in cases vs controls of rare, protein-coding, segregating variants that are either (i) predicted loss-of-function (LoF), (ii) highly predicted pathogenic (Exomiser variant score >= 0.8), (iii) highly predicted pathogenic and present in a constrained coding region (CCR; 13) or (iv) de novo (restricted to only trios or larger families where de novo calling was possible and provided by the user). As well as various output files annotating these case-control association tests, Manhattan and volcano plots are generated summarising the FDR-adjusted p-values of all the gene-based tests for each case-control association analysis, along with lollipop plots of the relevant variants in cases and controls and plots of the hierarchical distribution of the Human Phenotype Ontology (HPO) case annotations for individual disease-gene associations.
 
-## System requirements
-### Software dependencies and operating systems
+## System requirements <a name="requirements"></a>
+### Software dependencies and operating systems <a name="dependencies"></a>
 The R framework only demands the presence of R or Rstudio and a standard computer with sufficient RAM to accommodate in-memory operations. The following R packages will need to be installed (if not already) via install.packages(‘packageName’) from R or install.packages("BiocManager") and BiocManager::install("biomaRt") for the biomaRt, ensembldb, drawProteins and AnnotationHub Bioconductor packages:
 
 ```R
@@ -23,12 +33,12 @@ The R framework was tested using R/4.1.0.
 
 Non-standard hardware is not required but to analyse larger cohorts it is useful to have access to a large, high compute cluster to run as many jobs in parallel as possible and reduce the overall run-time.
 
-## Installation guide
+## Installation guide <a name="installation"></a>
 Installation is from our GitHub repository, e.g. git clone https://github.com/whri-phenogenomics/geneBurdenRD.git or a download from https://github.com/whri-phenogenomics/geneBurdenRD/tree/master#:~:text=Download-,ZIP
 
 As the installation involves simply cloning/downloading from a GitHub repo it only takes a matter of seconds on any computer.
 
-## Demo
+## Demo <a name="demo"></a>
 The installation comes with the following example data:
 example **exomiser_master_file_passvars.tsv** file that can be used as input to the main R analysis. This file contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant.
 
@@ -36,7 +46,7 @@ example **exomiser_master_file_passvars.tsv** file that can be used as input to 
 
 **PFFS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_10 with a 0 in the caco column to indicate controls.
 
-### How to run the analysis on the demo data
+### How to run the analysis on the demo data <a name="rundemo"></a>
 
 git clone or download zip geneBurdenRD as described above.\
 cd into the 'geneBurdenRD' folder:
@@ -76,7 +86,7 @@ or the task id in the matrix, fisher and visualization cluster shell scripts:
 #$ -t 1-3
 ```
 
-### Expected output:
+### Expected output: <a name="output"></a>
 
 The **_./results_** folder includes the geneBurdenRD FDR tsv file, which provides a summary of statistics for all signals and includes:
 ```
