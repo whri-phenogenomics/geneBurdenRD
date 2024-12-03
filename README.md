@@ -43,11 +43,13 @@ As the installation involves simply cloning/downloading from a GitHub repo it on
 ## Demo <a name="demo"></a>
 The installation comes with the following example data:
 
-**exomiser_master_file_passvars.tsv** contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant.
+**exomiser_master_file_passvars.tsv** contains processed Exomiser output (using produce_generic_exomiser_master_file_final.pl) from 10 singleton cases with several hundred rare, coding variants per case that passed the Exomiser filters including a heterozygous, pathogenic, _FGFR2:ENST00000358487.10:c.1694A>C:p.(Glu565Ala)_ variant that causes Pfeiffer syndrome and annotated with randomised HPO terms characterising the disease along with processed output from 100 singleton controls that do not have Pfeiffer syndrome or this _FGFR2_ variant. In addition, FGFR1 causative variants and BBS variants have been added.
 
 **analysisLabelList.tsv** contains a header row (analysis.label, analysis), followed by rows that specify a string representing the tested disease (e.g., PFFS) and a description of the disease tested (e.g., Pfeiffer syndrome).
 
 **PFFS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_10 with a 0 in the caco column to indicate controls.
+
+**BBS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_11 to case_20 with a 1 in the caco column to signify these are the cases and then 100 ro$
 
 ### How to run the analysis on the demo data <a name="rundemo"></a>
 
@@ -147,7 +149,7 @@ Prepare your own version of the input files (as below) and then run as described
 ```perl
 perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de novo file> <optional CCR file> <optional assembly: b37 or b38 (default)>
 ```
-   - Samples file is the list of sampleIDs used to name Exomiser output files with the full path prefix if not in the current directory (one per line)
+   - Samples file is a tab-sep file of sample ID used to name Exomiser output files (sampleID.genes.tsv and sampleID.variants.tsv), family size, HPO IDs (comma separated) and HPO terms (comma separated) (one sample per line)
    - De novo file is a tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants (one per line)
    - CCR file contains constrained coding regions in chr:start-end format (one per line)
 
