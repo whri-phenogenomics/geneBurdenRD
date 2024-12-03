@@ -4,7 +4,7 @@ use warnings;
 
 # Example usage: perl produce_generic_exomiser_master_file_final.pl exomiser_samples_b38.tsv denovo_b38.tsv ccr_95_hg38.tsv b38
 
-my $samples_file = $ARGV[0] || die;# list of sample IDs used to name Exomiser output files (one per line)
+my $samples_file = $ARGV[0] || die;# tab-sep file of sample ID used to name Exomiser output files (sampleID.genes.tsv and sampleID.variants.tsv), family size, HPO IDs (comma separated) and HPO terms (comma separated) (one sample per line)
 my $de_novo_file = $ARGV[1] || '';# optional tab-sep file with sampleID, chr, pos, ref, alt for de novo called variants 
 my $ccr_file = $ARGV[2] || '';# optional CCR file defining constrained coding regions in chr:start-end format 
 my $assembly = $ARGV[3] || 'b38';# b37 or b38(default) assembly
@@ -39,8 +39,6 @@ if ($ccr_file ne ''){
 
 my $total_case_count = 0;
 my %var_counts;
-
-# add fam size, hpo ids and hpo terms to the samples file and add to the output at the end
 
 open(EXOMISER_MASTER_FILE,">exomiser_master_file_final_allvars.tsv");
 print EXOMISER_MASTER_FILE "Sample ID\tGene\tVariant\tGenotypes\tExomiserMOI\tFunctional Class\tMax Freq\tGnomAD Freq\tDe novo\tRank\tScore\tVariant Score\tPheno Score\tHuman Pheno Score\tBest Evidence\tHuman Evidence\tMouse Evidence\tFish Evidence\tHuman PPI Evidence\tHGVS\tAssembly\tFam Structure\tHPO IDs\tHPO terms\n";
