@@ -43,7 +43,7 @@ if(length(args)<3){
 
 } 
 
-if(length(args)>=4){
+if (length(args) >= 4 && !(args[4] %in% c("plot", "table_only"))) {
   
   print("Argument[4] provided")
   p.adjust.fdr_threshold <-args[4]
@@ -64,27 +64,53 @@ sign_pval_DF<-pval_DF %>% filter(p.adjust.fdr<=p.adjust.fdr_threshold)
 #Retrieve additional information from your masterfile
 exomiserFile <- args[2] # e.g. "data/exomiser_master_file_passvars.tsv"
 
-exomiser.extrainfo <- read_tsv(exomiserFile)
+exomiser <- read_tsv(exomiserFile)
 
 #Make column name lower case
-colnames(exomiser.extrainfo) <- make.names(tolower(colnames(exomiser.extrainfo)))
+colnames(exomiser) <- make.names(tolower(colnames(exomiser)))
 
 #Added this only because masterfile contain variants NA
-exomiser.extrainfo<-exomiser.extrainfo %>% filter(!is.na(exomiser.extrainfo$variant))
+exomiser<-exomiser %>% filter(!is.na(exomiser$variant))
 
 #Clean functional class data
-exomiser.extrainfo$functional.class <- tolower(exomiser.extrainfo$functional.class)
-exomiser.extrainfo$functional.class <- sub(".$", "", exomiser.extrainfo$functional.class)
+exomiser$functional.class <- tolower(exomiser$functional.class)
+exomiser$functional.class <- sub("\\|$", "", exomiser$functional.class)
+
+#Create counter variable by sample.id
+exomiser <- exomiser %>%
+  group_by(sample.id) %>%
+  mutate(counter = row_number())
+
+#Sample list
+sampleIDs <- exomiser %>%
+  filter(counter == 1) %>%
+  dplyr::select(sample.id)
+
+exomiser <- exomiser %>%
+  ungroup()
+
+exomiser$unique.casegene.id <- paste(exomiser$sample.id, exomiser$gene, sep = "-")
+
+# Create varcasegene.counter: counts of variants per each GeL patient (case) and each gene
+# This mutate command may take a while interactively
+exomiser <- exomiser %>%
+  group_by(sample.id, gene) %>%
+  mutate(varcasegene.counter = row_number()) %>%
+  ungroup()
+
+table(exomiser$varcasegene.counter)
+
+
 
 # List functional classes
-func.class <- data.frame(table(exomiser.extrainfo$functional.class))
+func.class <- data.frame(table(exomiser$functional.class))
 func.class <- func.class[order(-func.class$Freq),]
 
 # vartype: at least 1 LoF ----
 word <- c("start_lost", "stop_gained", "stop_lost", "frameshift_elongation", "frameshift_truncation", "frameshift_variant", "splice_donor_variant", "splice_acceptor_variant", "exon_loss_variant", "initiator_codon_variant")
 pattern <- paste0('.*', word, '.*', collapse = '|')
 pattern
-exomiser.extrainfo$vartype <- ifelse(grepl(pattern, exomiser.extrainfo$functional.class), 'LoF', NA)
+exomiser$vartype <- ifelse(grepl(pattern, exomiser$functional.class), 'LoF', NA)
 func.class$vartype <- ifelse(grepl(pattern, func.class$Var1), 'LoF', NA)
 
 sum(is.na(func.class$vartype))
@@ -93,7 +119,7 @@ sum(is.na(func.class$vartype))
 word <- c("missense")
 pattern <- paste0('.*', word, '.*', collapse = '|')
 pattern
-exomiser.extrainfo$vartype <- ifelse(is.na(exomiser.extrainfo$vartype) == TRUE & grepl(pattern,exomiser.extrainfo$functional.class), 'missense', exomiser.extrainfo$vartype)
+exomiser$vartype <- ifelse(is.na(exomiser$vartype) == TRUE & grepl(pattern,exomiser$functional.class), 'missense', exomiser$vartype)
 func.class$vartype <- ifelse(is.na(func.class$vartype) == TRUE & grepl(pattern,func.class$Var1), 'missense', func.class$vartype)
 
 sum(is.na(func.class$vartype))
@@ -102,25 +128,27 @@ sum(is.na(func.class$vartype))
 word <- c("synonymous")
 pattern <- paste0('.*', word, '.*', collapse = '|')
 pattern
-exomiser.extrainfo$vartype <- ifelse(is.na(exomiser.extrainfo$vartype) == TRUE & grepl(pattern,exomiser.extrainfo$functional.class), 'synonymous', exomiser.extrainfo$vartype)
+exomiser$vartype <- ifelse(is.na(exomiser$vartype) == TRUE & grepl(pattern,exomiser$functional.class), 'synonymous', exomiser$vartype)
 func.class$vartype <- ifelse(is.na(func.class$vartype) == TRUE & grepl(pattern,func.class$Var1), 'synonymous', func.class$vartype)
 
 sum(is.na(func.class$vartype))
 
 # vartype: other (if no LoF, no missense, no synonymous) ----
-word <- c("splice_region", "transcript_ablation", "intron", "upstream" , "sequence", "intergenic", "prime", "downstream", "inframe_insertion", "inframe_deletion", "structural_variant", "stop_retained_variant")
-pattern <- paste0('.*', word, '.*', collapse = '|')
-pattern
+#word <- c("splice_region", "transcript_ablation", "intron", "upstream" , "sequence", "internal_feature_elongation", "intergenic", "prime", "downstream", "inframe_insertion", "inframe_deletion", "structural_variant", "stop_retained_variant")
+#pattern <- paste0('.*', word, '.*', collapse = '|')
+#pattern
 
-exomiser.extrainfo$vartype <- ifelse(is.na(exomiser.extrainfo$vartype) == TRUE & grepl(pattern, exomiser.extrainfo$functional.class), 'other', exomiser.extrainfo$vartype)
-func.class$vartype <- ifelse(is.na(func.class$vartype) == TRUE & grepl(pattern, func.class$Var1), 'other', func.class$vartype)
+#exomiser$vartype <- ifelse(is.na(exomiser$vartype) == TRUE & grepl(pattern, exomiser$functional.class), 'other', exomiser$vartype)
+#func.class$vartype <- ifelse(is.na(func.class$vartype) == TRUE & grepl(pattern, func.class$Var1), 'other', func.class$vartype)
 
-sum(is.na(func.class$vartype))
+#To be more flexible I think we should classify anything that is NA into "other"
+exomiser$vartype <- ifelse(is.na(exomiser$vartype) == TRUE, 'other', exomiser$vartype)
+func.class$vartype <- ifelse(is.na(func.class$vartype) == TRUE, 'other', func.class$vartype)
 
 # Check what it is left as NA 
-func.class[is.na(func.class$vartype), ]
+sum(is.na(func.class$vartype))
+sum(is.na(exomiser$vartype))
 
-sum(is.na(exomiser.extrainfo$vartype))
 func.class %>%
   group_by(vartype) %>%
   summarise(n = n())
@@ -135,8 +163,7 @@ print(paste0("There are ",nrow(sign_pval_DF)," significant signals with p.adjust
 
 
 #Extract list of unique disease level per significant signals
-sign_analysis_label<-as.data.frame(table(sign_pval_DF$analysis.label))
-names(sign_analysis_label)[names(sign_analysis_label) == 'Var1'] <- 'analysis.label'
+sign_analysis_label <- setNames(as.data.frame(table(sign_pval_DF$analysis.label)), c("analysis.label", "Freq"))
 
 #Load disease list
 analysisLabelListFile <- args[3]  # e.g. "data/analysisLabelList.tsv"
@@ -159,7 +186,7 @@ if(!disease %in% sign_analysis_label$analysis.label){
 
 #if plotting is requested as argument -
 
-if (length(args) == 5) {
+if (length(args) == 5 && (args[5] %in% c("plot", "table_only"))) {
   
   plotting_arg<-args[5]
   plotting_arg<-as.character(plotting_arg)
@@ -183,26 +210,9 @@ if(plotting=="Y"){
   
   print("Plotting the data...")
   
-  
-  #extract chromosome_name and start_position from variant in masterfile
-  exomiser.extrainfo$to_split<-exomiser.extrainfo$variant
-  
-  exomiser.extrainfo<-separate(exomiser.extrainfo, to_split, c("chr","start"),remove = TRUE)
-  
-  exomiser.extrainfo$start<-as.numeric(exomiser.extrainfo$start)
-  
-  exomiser.extrainfo_genes <- exomiser.extrainfo %>% 
-    group_by(gene) %>% 
-    summarise(chr=unique(chr),mean_start = ((max(start)+min(start))/2))
-  
-  pval_DF$chromosome_name<-exomiser.extrainfo_genes$chr[match(pval_DF$gene,exomiser.extrainfo_genes$gene)]
-  pval_DF$start_position<-exomiser.extrainfo_genes$mean_start[match(pval_DF$gene,exomiser.extrainfo_genes$gene)]
-  
-  
   #list of genes to annotate
-  sign_genes<-data.frame(table(sign_pval_DF$gene))
-  names(sign_genes)[names(sign_genes) == 'Var1'] <- 'gene'
-  sign_genes$Freq<-NULL
+  sign_genes <- setNames(data.frame(unique(sign_pval_DF$gene)), "gene")
+  
   
   #######################################################
   #    Annotate genes using BiomaRt if outside the RE   #
@@ -221,14 +231,13 @@ if(plotting=="Y"){
                     filters=c('hgnc_symbol'),
                     values=list(sign_genes$gene),
                     mart=ensembl)
+
+  annotation <- annotation[!grepl("CHR_.*|KI.*|GL.*", annotation$chromosome_name), ]
   
-  annotation<-annotation[!grepl("CHR_.*",annotation$chromosome_name),]
-  annotation<-annotation[!grepl("KI.*",annotation$chromosome_name),]
-  annotation<-annotation[!grepl("GL.*",annotation$chromosome_name),]
   
   #Order and remove duplicates
-  annotation<-annotation %>% arrange(desc(uniprotswissprot),desc(chromosome_name))
-  annotation<-annotation[!duplicated(annotation[,c('hgnc_symbol')]),]
+  annotation <- annotation %>% arrange(desc(uniprotswissprot), desc(chromosome_name)) %>% distinct(hgnc_symbol, .keep_all = TRUE)
+  
   
   #Clean description
   
@@ -267,10 +276,9 @@ if(plotting=="Y"){
   
   
   #Extract list of unique disease level per significant signals
-  sign_analysis_label<-as.data.frame(table(sign_pval_DF$analysis.label))
-  names(sign_analysis_label)[names(sign_analysis_label) == 'Var1'] <- 'analysis.label'
+  sign_analysis_label <- setNames(as.data.frame(table(sign_pval_DF$analysis.label)), c("analysis.label", "Freq"))
   
-    
+  
     setwd(path_to_analysis)
     
     #extract pvalues for disease
@@ -306,121 +314,100 @@ if(plotting=="Y"){
     library(ggrepel)
     
     ###############################
-    #       Manhattan plot        #
+    #       Volcano plot        #
     ###############################
     
-    
-    #Check number of chromosome annotations
-    
-    chromosomes<-as.data.frame(table(annotation$chromosome_name))
-    
-    if(nrow(chromosomes)!=25){
-      
-      print("Manhattan and volcano plots are only available for genome wide analysis")
+    pval_DF_analysis_label$p.adjust.fdr<-as.numeric(pval_DF_analysis_label$p.adjust.fdr)
+      pval_DF_analysis_label$log_fdr<-(-log10(pval_DF_analysis_label$p.adjust.fdr))
+    if (any(is.infinite(pval_DF_analysis_label$log_fdr))) {
+    if (all(is.infinite(pval_DF_analysis_label$log_fdr))) {
+      # Set all log_or values to 5 if all are infinite
+      pval_DF_analysis_label$log_fdr <- 8
+      print("All -log10(p.adjust.fdr) go to infinite: value set to default")
       
     }else{
       
-      #table for Manhattan plot
-      pval_DF_analysis_label_manhattan <- pval_DF_analysis_label %>% group_by(chromosome_name,gene) %>% dplyr::arrange(chromosome_name,start_position)
-      
-      #Additional annotation for Manhattan plot like chromosome order and deal with missing chromosomes
-      pval_DF_analysis_label_manhattan$chromosome <- NA
-      s <- 0
-      nbp <- c()
-      
-      chrOrder <-as.data.frame(table(pval_DF_analysis_label_manhattan$chromosome_name))
-      chr <-c((1:22),"X","Y","MT")
-      chrOrder<-chrOrder[match(chr, chrOrder$Var1),]
-      chrOrder<- chrOrder %>% dplyr::filter(!is.na(chrOrder$Freq))
-      chrOrder<-as.vector(chrOrder$Var1)
-      
-      pval_DF_analysis_label_manhattan$chromosome_name <- factor(pval_DF_analysis_label_manhattan$chromosome_name, chrOrder, ordered=TRUE)
-      pval_DF_analysis_label_manhattan<-pval_DF_analysis_label_manhattan[do.call(order, pval_DF_analysis_label_manhattan[, c("chromosome_name")]), ]
-      
-      for (j in unique(pval_DF_analysis_label_manhattan$chromosome_name)){
-        nbp[j] <- max(pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,]]$start_position)
-        pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"chromosome"]] <- pval_DF_analysis_label_manhattan[[pval_DF_analysis_label_manhattan$chromosome_name == j,"start_position"]] + s
-        s <- s + nbp[j]
-      }
-      
-      #Significant genes whose name will be shown in plot
-      sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<=p.adjust.fdr_threshold)
-      
-      #Set axis
-      axis.set <- pval_DF_analysis_label_manhattan %>% 
-        group_by(chromosome_name) %>% 
-        summarize(center = (max(chromosome) + min(chromosome)) / 2)
-
-      
-      #Generate manhattan plot
-      p <- pval_DF_analysis_label_manhattan %>%
-        group_by(chromosome_name,gene) %>%
-        arrange(chromosome_name,start_position) %>%
-        ggplot( aes(x = chromosome,y = -log10(p.adjust.fdr), color=test, label=gene)) +
-        geom_point(size=2.5) +
-        geom_hline(yintercept = -log10(p.adjust.fdr_threshold), color = "maroon", linetype = "dashed")+ 
-        scale_x_continuous(label = axis.set$chromosome_name, breaks = axis.set$center) +
-        theme_minimal() +
-        theme(panel.border = element_blank(),
-              legend.title = element_blank(),
-              panel.grid.major.x = element_blank(),
-              panel.grid.minor.x = element_blank(),
-              axis.text.x = element_text(angle = 90, size = 8, vjust = 0.5,margin=margin(-15,0,0,0))
-        )
-      
-      temp_plot = p+ 
-        labs(title = sign_analysis_label_read)+
-        geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
-        theme(text = element_text(family = "Bookman",size = 11),
-              legend.title = element_blank(),
-              legend.text = element_text(size = 10),
-              axis.ticks.x=element_blank(),
-              plot.subtitle = element_text(size=10, hjust=0.5),
-              plot.title=element_text(size=16, 
-                                      face="bold", 
-                                      family="Bookman",
-                                      color="gray60",
-                                      hjust=0.5,
-                                      lineheight=1.2))
-      
-      #print(temp_plot)
-      #save the plot
-      ggsave(temp_plot, file=paste0(disease,"_manhattanplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
-      print(paste0(disease,"_manhattanplot.png saved!"))
-      
-      
-      #Generate volcano plot
-      
-      sign_to_plot<-pval_DF_analysis_label_manhattan %>% dplyr::filter(p.adjust.fdr<= p.adjust.fdr_threshold & or >= 3)
-      
-      volcano <- ggplot(pval_DF_analysis_label_manhattan, aes(x = log2(or), y = -log10(p.adjust.fdr), color=test)) +
-        geom_point() +
-        theme_minimal() +
-        geom_hline(yintercept = -log10(p.adjust.fdr_threshold), col = "maroon", linetype = "dashed") +
-        geom_vline(xintercept = log2(3), col = "maroon", linetype = "dashed")
-      
-      
-      temp_plot_volcano = volcano+ 
-        labs(title = sign_analysis_label_read)+
-        geom_text_repel(data=sign_to_plot,size=4,aes(label = gene),show.legend = FALSE,colour='gray20')+
-        theme(text = element_text(family = "Bookman",size = 11),
-              legend.title = element_blank(),
-              legend.text = element_text(size = 10),
-              axis.ticks.x=element_blank(),
-              plot.subtitle = element_text(size=10, hjust=0.5),
-              plot.title=element_text(size=16, 
-                                      face="bold", 
-                                      family="Bookman",
-                                      color="gray60",
-                                      hjust=0.5,
-                                      lineheight=1.2))
-      
-      
-      ggsave(temp_plot_volcano, file=paste0(disease,"_volcanoplot.png"),width = 2560/227, height = 1600/227, dpi = 227,bg='#ffffff')
-      print(paste0(disease,"_volcanoplot.png saved!"))
+      pval_DF_analysis_label$log_fdr<-ifelse(is.infinite(pval_DF_analysis_label$log_fdr),max(-log10(pval_DF_analysis_label$p.adjust.fdr[is.finite(-log10(pval_DF_analysis_label$p.adjust.fdr))]))+1,pval_DF_analysis_label$log_fdr)
+      print("-log10(p.adjust.fdr) that to go to infinite are approximated to the maximum value")
       
     }
+    }
     
+    pval_DF_analysis_label$or<-as.numeric(pval_DF_analysis_label$or)
+      pval_DF_analysis_label$log_or<-(log2(pval_DF_analysis_label$or))
+      if (any(is.infinite(pval_DF_analysis_label$log_or))) {
+      if (all(is.infinite(pval_DF_analysis_label$log_or))) {
+        # Set all log_or values to 5 if all are infinite
+        pval_DF_analysis_label$log_or <- 5
+        print("All log2(OR) go to infinite: value set to default")
+        
+      } else {
+        
+        pval_DF_analysis_label$log_or<-ifelse(is.infinite(pval_DF_analysis_label$log_or),max(log2(pval_DF_analysis_label$or[is.finite(log2(pval_DF_analysis_label$or))]))+1,pval_DF_analysis_label$log_or)
+        print("-log2(OR) that to go to infinite are approximated to the maximum value")
+      }
+      }
+    
+
+
+      #Generate volcano plot
+      
+      sign_to_plot<-pval_DF_analysis_label %>% dplyr::filter(p.adjust.fdr<= p.adjust.fdr_threshold & or >= 3)
+      
+      log_fdr_intercept<-(-log10(p.adjust.fdr_threshold))
+      log_or_intercept<-log2(3)
+      
+      volcano <- ggplot(pval_DF_analysis_label, aes(x = log_or, y = log_fdr, color = test)) +
+        geom_point() +
+        theme_classic() +  # Use classic theme for black axis lines
+        
+        # Dashed intercept lines
+        geom_hline(yintercept = log_fdr_intercept, col = "maroon", linetype = "dashed") +
+        geom_vline(xintercept = log_or_intercept, col = "maroon", linetype = "dashed") +
+        
+        # Set axis limits to start from 0, add a small extension to avoid cutting off points, and set custom breaks
+        scale_x_continuous(limits = c(0, max(pval_DF_analysis_label$log_or) * 1.05), expand = c(0, 0), breaks = scales::pretty_breaks()) +
+        scale_y_continuous(limits = c(0, max(pval_DF_analysis_label$log_fdr) * 1.05), expand = c(0, 0), breaks = scales::pretty_breaks()) +
+        
+        # Add labels and axis titles
+        labs(
+          title = sign_analysis_label_read,
+          x = expression(log[2](OR)),
+          y = expression(-log[10](p.adjust.fdr))
+        ) +
+        
+        # Add gene labels to specific points
+        geom_text_repel(data = sign_to_plot, size = 4, aes(label = gene), show.legend = FALSE, colour = 'gray20') +
+        
+        # Customize theme to reduce space between axis and label and add minor grid lines
+        theme(
+          text = element_text(family = "sans"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 10),
+          axis.ticks.x = element_blank(),
+          axis.title.x = element_text(margin = margin(t = 5)),  # Reduce space for x-axis label
+          axis.title.y = element_text(margin = margin(r = 5)),  # Reduce space for y-axis label
+          panel.grid.major = element_line(color = "grey90"),
+          panel.grid.minor = element_line(color = "grey90", size = 0.25),  # Add smaller grid lines
+          plot.subtitle = element_text(size = 10, hjust = 0.5),
+          plot.title = element_text(
+            size = 16,
+            face = "bold",
+            family = "sans",
+            color = "gray60",
+            hjust = 0.5,
+            lineheight = 1.2
+          )
+        )
+      
+      # Save the plot
+      ggsave(volcano, file = paste0(disease, "_volcanoplot.png"), width = 2560/227, height = 1600/227, dpi = 227, bg = "#ffffff")
+      
+      # Print save confirmation
+      print(paste0(disease, "_volcanoplot.png saved!"))
+      
+
+      
     ###############Generate addiyional tables,lolliplot and hpo plot
   
     #read caco definition TSV file
@@ -453,7 +440,7 @@ if(plotting=="Y"){
       pval_sign_gene_test<-pval_sign_gene %>% dplyr::filter(gene==sign_gene) %>% dplyr::filter(test==sign_test)
       
       #Extract all variants in that gene
-      gene_all<-exomiser.extrainfo  %>% dplyr::filter(gene==sign_gene)
+      gene_all<-exomiser  %>% dplyr::filter(gene==sign_gene)
       
       #Extract caco or caco.denovo info
       if(sign_test=="denovo"){
@@ -469,6 +456,62 @@ if(plotting=="Y"){
       
       
       table(gene_all$caco, useNA = "always")
+      
+      
+      if (file.exists(paste0(path_to_analysis, "/output/probandDataMatrix/probandDataMatrix_", disease, ".tsv"))) {
+        
+        #####################
+        contrib_variants <- read_tsv(paste0(path_to_analysis, "/output/probandDataMatrix/probandDataMatrix_", disease, ".tsv"))
+        
+        print(paste0("Reading probandDataMatrix_", disease, ".tsv file"))
+        
+        contrib_variants <- contrib_variants %>%
+          dplyr::filter((drop_1 == 1 & drop_2 == 0) | (drop_1 == 0 & drop_2 == 1) | (drop_1 == 0 & drop_2 == 0) | (drop_1 == 0 & is.na(drop_2))) %>%
+          dplyr::filter(gene == sign_gene)
+        
+        # Filter variants based on the test that has been run
+        if (sign_test == "LoF") {
+          contrib_variants <- contrib_variants %>% dplyr::filter(max.vartype == "LoF")
+        } else if (sign_test == "zero80") {
+          contrib_variants <- contrib_variants %>% dplyr::filter(max.varscore >= 0.80)
+        } else if (sign_test == "denovo") {
+          contrib_variants <- contrib_variants %>% dplyr::filter(max.denovo == '1' & fam.structure >= 3)
+        } else {
+          contrib_variants <- contrib_variants %>% dplyr::filter(max.ccr == 1 & max.varscore >= 0.8)
+        }
+        
+        # Extract caco or caco.denovo info
+        if (sign_test == "denovo") {
+          contrib_variants$caco <- caco_def$caco.denovo[match(contrib_variants$sample.id, caco_def$sample.id)]
+        } else {
+          contrib_variants$caco <- caco_def$caco[match(contrib_variants$sample.id, caco_def$sample.id)]
+        }
+        
+        table(contrib_variants$caco, useNA = "always")
+        
+        cases_contrib <- contrib_variants %>% dplyr::filter(caco == 1)
+        controls_contrib <- contrib_variants %>% dplyr::filter(caco == 0)
+        
+        if (length(unique(cases_contrib$sample.id)) == pval_sign_gene_test$d) {
+          print(paste0("Match: ", length(unique(cases_contrib$sample.id)), " variants found == d (", pval_sign_gene_test$d, ")"))
+        } else {
+          print(paste0("Mismatch: ", length(unique(cases_contrib$sample.id)), " variants found != d (", pval_sign_gene_test$d, ")"))
+          break
+        }
+        
+        if (length(unique(controls_contrib$sample.id)) == pval_sign_gene_test$c) {
+          print(paste0("Match: ", length(unique(controls_contrib$sample.id)), " variants found == c (", pval_sign_gene_test$c, ")"))
+        } else {
+          print(paste0("Mismatch: ", length(unique(controls_contrib$sample.id)), " variants found != c (", pval_sign_gene_test$c, ")"))
+          break
+        }
+        
+        contrib_df <- contrib_variants %>%
+          dplyr::select(sample.id, variant.lift_1, variant.lift_2) %>%
+          reshape2::melt(id.vars = "sample.id") %>%
+          dplyr::filter(!is.na(value))
+        
+      }
       
       #Add readable caco definition
       gene_all$caco_definition<-ifelse(gene_all$caco==1,"case",NA)
@@ -488,8 +531,21 @@ if(plotting=="Y"){
         gene_test<- gene_all  %>% dplyr::filter(ccr.flag==1 & variant.score>=0.8)
       }
       
-      #Extract number of cases contributing to the test
-      cases<-gene_test %>% dplyr::filter(caco==1)
+      if (exists("contrib_df")) {
+        
+      gene_test$check <- ifelse(gene_test$sample.id %in% contrib_df$sample.id & gene_test$variant.lift %in% contrib_df$value, "Contrib", "Not contrib")
+      
+      gene_test$caco_definition <- ifelse(gene_test$caco_definition == "case" & gene_test$check == "Not contrib", "case_drop_varfilter", gene_test$caco_definition)
+      gene_test$caco_definition <- ifelse(gene_test$caco_definition == "control" & gene_test$check == "Not contrib", "control_drop_varfilter", gene_test$caco_definition)
+      gene_test$check<-NULL
+      
+      }
+      
+      table(gene_test$caco_definition, useNA = "always")
+      
+      # Extract number of cases contributing to the test
+      cases <- gene_test %>% dplyr::filter(caco_definition == "case")
+      controls <- gene_test %>% dplyr::filter(caco_definition == "control")
       
       if(length(unique(cases$sample.id))==pval_sign_gene_test$d){
         
@@ -499,23 +555,30 @@ if(plotting=="Y"){
         
         print(paste0("Mismatch: ",length(unique(cases$sample.id))," variants found != d (",pval_sign_gene_test$d,")"))
         
-        
       }
       
-      #Extract not contributing variants based on the test that has been run
-      if (sign_test=="LoF"){
-        not_contributing<- gene_all  %>% dplyr::filter(!vartype=="LoF")
-      }else if(sign_test=="zero80"){
-        not_contributing<- gene_all  %>% dplyr::filter(!variant.score>=0.80)
-      }else if(sign_test=="denovo"){
-        not_contributing<- gene_all  %>% dplyr::filter(!de.novo=='Y' & fam.structure >=3)
-      }else{
-        not_contributing<- gene_all  %>% dplyr::filter(!ccr.flag==1 & variant.score>=0.8)
+      
+      if (length(unique(controls$sample.id)) == pval_sign_gene_test$c) {
+        print(paste0("Match: ", length(unique(controls$sample.id)), " variants found == c (", pval_sign_gene_test$c, ")"))
+      } else {
+        print(paste0("Mismatch: ", length(unique(controls$sample.id)), " variants found != c (", pval_sign_gene_test$c, ")"))
+        break
       }
       
-      not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="case","not_contributing_case",not_contributing$caco_definition)
-      not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="control","not_contributing_control",not_contributing$caco_definition)
-      not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="excluded","not_contributing_excluded",not_contributing$caco_definition)
+      # Extract not contributing variants based on the test that has been run
+      if (sign_test == "LoF") {
+        not_contributing <- gene_all %>% dplyr::filter(vartype != "LoF")
+      } else if (sign_test == "zero80") {
+        not_contributing <- gene_all %>% dplyr::filter(variant.score < 0.80)
+      } else if (sign_test == "denovo") {
+        not_contributing <- gene_all %>% dplyr::filter(de.novo != 'Y' | fam.structure < 3)
+      } else {
+        not_contributing <- gene_all %>% dplyr::filter(ccr.flag != 1 | variant.score < 0.8)
+      }
+      
+      not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "case", "not_contributing_case", not_contributing$caco_definition)
+      not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "control", "not_contributing_control", not_contributing$caco_definition)
+      not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "excluded", "not_contributing_excluded", not_contributing$caco_definition)
 
       #Merge contributing and not contributing variants
       gene_test<-rbind(gene_test,not_contributing)
@@ -527,14 +590,16 @@ if(plotting=="Y"){
       gene_test<-gene_test %>% dplyr::select(caco_definition,caco,sample.id,hpo.terms,hpo.ids,gene,fam.structure,variant:ccr.flag,vartype,everything()) %>% dplyr::arrange(caco_definition,variant)
       
       #Eventually do some data cleaning
-      gene_test$hgvs<-sub(".$","",gene_test$hgvs)
-      gene_test$exomiser.result.count<-sub(".$","",gene_test$exomiser.result.count)
-      gene_test$genotypes<-sub(".$","",gene_test$genotypes)
+      gene_test$hgvs<-sub("\\|$","",gene_test$hgvs)
+      gene_test$exomiser.result.count<-sub("\\|$","",gene_test$exomiser.result.count)
+      gene_test$genotypes<-sub("\\|$","",gene_test$genotypes)
 
-      #Order table by case/control definition
-      caco_def_order<-c("case","excluded","control","not_contributing_case","not_contributing_excluded","not_contributing_control")
       
-      gene_test <- gene_test[order(factor(gene_test$caco_definition, levels=unique(caco_def_order))),]
+      # Order table by case/control definition
+      caco_def_order <- c("case", "case_drop_varfilter", "excluded", "control", "control_drop_varfilter", 
+                          "not_contributing_case", "not_contributing_excluded", "not_contributing_control")
+      
+      gene_test <- gene_test[order(factor(gene_test$caco_definition, levels = unique(caco_def_order))), ]
       
       #Write variants table
       write.table(gene_test,paste0(sign_gene_test,"_",disease,"_variants.tsv"), sep="\t", row.names = FALSE)
@@ -547,8 +612,8 @@ if(plotting=="Y"){
       ###############################
       
       
-      #Plot only cases or excluded with contruting variants
-      gene_test<-gene_test %>% dplyr::filter(caco_definition=="case"|caco_definition=="excluded")
+      #Plot only cases with contruting variants
+      gene_test<-gene_test %>% dplyr::filter(caco_definition=="case")
       
       #Impose limit of 100 variants to be plotted, plot wouldn't be readable
       if(nrow(gene_test)>=100){
@@ -589,7 +654,7 @@ if(plotting=="Y"){
       gene_test<-gene_test[!duplicated(gene_test[,c('sample.id','gene','variant')]),]
       
       #info abou the gene
-      gene_info<-gene_test %>% dplyr::slice(1) %>% dplyr::select(gene,chromosome_name,start_position,end_position,description,strand,uniprotswissprot)
+      gene_info<-pval_sign_gene %>% dplyr::slice(1) %>% dplyr::select(gene,chromosome_name,start_position,end_position,description,strand,uniprotswissprot)
       
       #Uniprot code for the gene
       uniprot<-gene_info %>% dplyr::select(gene,uniprotswissprot)
@@ -660,7 +725,7 @@ if(plotting=="Y"){
       
         transcripts<-as.data.frame(table(gsub("\\..*","",transcripts$Var1)))
         
-        select_transcript<-transcripts$Var1
+        select_transcript<-as.character(transcripts$Var1)
         
       }else{
         
@@ -676,7 +741,7 @@ if(plotting=="Y"){
       gene_test$select_transcript<-as.character(select_transcript)
       
       
-      #Re-annotate variants with no HGVS annotated protein change by trying identifying closer aminoacid
+      #Re-annotate variants with no HGVS annotated protein change by identifying closer aminoacid
       gene_test$select_p_change<-NA
       
       gene_test$select_p_change<-ifelse((grepl(paste0("^",select_transcript),gene_test$hgvs_transcript))&((gene_test$hgvs_p_change=='?'|gene_test$hgvs_p_change=='=')==FALSE),gene_test$hgvs_p_change,gene_test$select_p_change)
@@ -724,7 +789,7 @@ if(plotting=="Y"){
             
             suppressWarnings({
               
-              edb <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == test$chromosome)
+              edb <- filter(edb, filter = ~ seq_name == test$chromosome)
               gnm_pos <- GRanges(test$chromosome, IRanges(var, width = 1))
               trc_pos <- genomeToTranscript(gnm_pos, edb)
               t_data<-data.frame(trc_pos)
@@ -766,7 +831,7 @@ if(plotting=="Y"){
                 var<-ifelse(((grepl("^c.\\-",fix_transcript$hgvs_c_change[k])==TRUE)&(gene_info$strand==1)),(var+1),(var-1))
                 print(var)
                 suppressWarnings({
-                  edb <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == test$chromosome)
+                  edb <- filter(edb, filter = ~ seq_name == test$chromosome)
                   gnm_pos <- GRanges(test$chromosome, IRanges(var, width = 1))
                   trc_pos <- genomeToTranscript(gnm_pos, edb)
                   t_data<-data.frame(trc_pos)
@@ -792,7 +857,7 @@ if(plotting=="Y"){
                 var<-ifelse(((grepl(pattern,fix_transcript$hgvs_c_change[k])==TRUE)&(gene_info$strand==-1))|((grepl(pattern,fix_transcript$hgvs_c_change[k])==FALSE)&(gene_info$strand==1)&(grepl("_",fix_transcript$hgvs_c_change[k])==FALSE)),(var+1),(var-1))
                 print(var)
                 suppressWarnings({
-                  edb <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == test$chromosome)
+                  edb <- filter(edb, filter = ~ seq_name == test$chromosome)
                   gnm_pos <- GRanges(test$chromosome, IRanges(var, width = 1))
                   trc_pos <- genomeToTranscript(gnm_pos, edb)
                   t_data<-data.frame(trc_pos)
@@ -833,7 +898,7 @@ if(plotting=="Y"){
                 var<-ifelse(((grepl(pattern,fix_transcript$hgvs_c_change[k])==TRUE)&(gene_info$strand==-1))|((grepl(pattern,fix_transcript$hgvs_c_change[k])==FALSE)&(gene_info$strand==1)&(grepl("_",fix_transcript$hgvs_c_change[k])==FALSE)),(var-1),(var+1))
                 print(var)
                 suppressWarnings({
-                  edb <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == test$chromosome)
+                  edb <- filter(edb, filter = ~ seq_name == test$chromosome)
                   gnm_pos <- GRanges(test$chromosome, IRanges(var, width = 1))
                   trc_pos <- genomeToTranscript(gnm_pos, edb)
                   t_data<-data.frame(trc_pos)
@@ -871,7 +936,7 @@ if(plotting=="Y"){
                 var<-ifelse(((grepl(pattern,fix_transcript$hgvs_c_change[k])==TRUE)&(gene_info$strand==-1))|((grepl(pattern,fix_transcript$hgvs_c_change[k])==FALSE)&(gene_info$strand==1)&(grepl("_",fix_transcript$hgvs_c_change[k])==FALSE)),(var+100),(var-100))
                 print(var)
                 suppressWarnings({
-                  edb <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == test$chromosome)
+                  edb <- filter(edb, filter = ~ seq_name == test$chromosome)
                   gnm_pos <- GRanges(test$chromosome, IRanges(var, width = 1))
                   trc_pos <- genomeToTranscript(gnm_pos, edb)
                   t_data<-data.frame(trc_pos)
@@ -916,8 +981,8 @@ if(plotting=="Y"){
       gene_test$fixed_p_change<-ifelse(is.na(gene_test$fixed_p_change),gene_test$select_p_change,gene_test$fixed_p_change)
       
       #Rename two columns
-      colnames(gene_test)[colnames(gene_test) == 'hgvs_gene_id'] <- "gene.symbol"
-      colnames(gene_test)[colnames(gene_test) == 'select_p_change'] <- "protein.change"
+      gene_test <- gene_test %>% dplyr::rename(gene.symbol = hgvs_gene_id, protein.change = select_p_change)
+
       
       #Create amino acid number variable
       var.aanum<-unlist(lapply(regmatches(gene_test$protein.change,gregexpr(pattern="*(\\d+)",gene_test$protein.change)),function(x) x[[1]]))
@@ -934,62 +999,13 @@ if(plotting=="Y"){
       #Additional annotation of the variants
       var<-gene_test
       var_allvariant<-var %>% mutate_all(as.character) #%>% select(gene,sample.id,variant,protein.change,functional.class,genotype,HL.def.hpo,syndromic,other.def.hpo,other.def.ancestors)
-      var<-var %>% dplyr::select(caco_definition,gene,sample.id,protein.change,functional.class,genotype,fixed_p_change,hpo.terms,hpo.ids,analysis.label,analysis)
+      var<-var %>% dplyr::select(caco_definition,gene,sample.id,protein.change,functional.class,genotype,fixed_p_change,hpo.terms,hpo.ids)
       var<-unique(var[!duplicated(var),])#remove duplicates
-      var[order(var$gene,gsub("([A-Z]+)([0-9]+)","\\2",var$protein.change)),]#order
+      var<-var[order(var$gene,gsub("([A-Z]+)([0-9]+)","\\2",var$protein.change)),]#order
       var.freq<-var %>%
-        dplyr::group_by(fixed_p_change,functional.class) %>%
+        dplyr::group_by(fixed_p_change,functional.class,genotype) %>%
         dplyr::mutate(freq = n()) %>% 
         dplyr::slice(1)
-      
-      #Fix situations with same variants
-      if(any(var.freq$freq>1)==TRUE){
-        
-        temp_var.freq<-var %>%
-          dplyr::group_by(fixed_p_change,functional.class) %>%
-          dplyr::mutate(freq = n())
-        
-        
-        #Fix situations with same variants different genotype
-        same_var_diff_gen<-temp_var.freq %>% dplyr::filter(freq>1) %>%
-          dplyr::group_by(fixed_p_change,genotype) %>%
-          dplyr::mutate(var_freq = n()) %>% 
-          dplyr::filter(var_freq!=freq)
-        
-        
-        if(nrow(same_var_diff_gen)>0){
-          
-          same_var_diff_gen$freq<-1:nrow(same_var_diff_gen)
-          
-          same_var_diff_gen$var_freq<-NULL
-          
-          test<-inner_join(var.freq[,1:11], same_var_diff_gen[,1:12])
-          test2<-anti_join(var.freq[,1:12], same_var_diff_gen[,1:11])
-          
-          
-          var.freq<-rbind(test,test2)
-          
-        }
-        
-        #Fix situations with same variants different caco definition
-        same_var_diff_caco<-temp_var.freq %>% dplyr::filter(freq>1) %>%
-          dplyr::group_by(fixed_p_change,caco_definition) %>%
-          dplyr::mutate(var_freq = n()) %>% 
-          dplyr::filter(var_freq!=freq)
-
- 
-        if(nrow(same_var_diff_caco)>0){
-          
-          n_excluded_same_var<-same_var_diff_caco %>% dplyr::filter(caco_definition == "excluded")
-          n_excluded_same_var$var_freq<-NULL
-          n_excluded_same_var$freq<-nrow(n_excluded_same_var)
-
-
-          var.freq<-rbind(var.freq,n_excluded_same_var)
-          
-        }
-        
-      }
       
       var.freq<-var.freq %>% ungroup 
       
@@ -1295,7 +1311,7 @@ if(plotting=="Y"){
           pval_sign_gene_test<-pval_sign_gene %>% dplyr::filter(gene==sign_gene) %>% dplyr::filter(test==sign_test)
           
           #Extract all variants in that gene
-          gene_all<-exomiser.extrainfo  %>% dplyr::filter(gene==sign_gene)
+          gene_all<-exomiser  %>% dplyr::filter(gene==sign_gene)
           
           #Extract caco or caco.denovo info
           if(sign_test=="denovo"){
@@ -1311,6 +1327,62 @@ if(plotting=="Y"){
           
           
           table(gene_all$caco, useNA = "always")
+          
+          
+          if (file.exists(paste0(path_to_analysis, "/output/probandDataMatrix/probandDataMatrix_", disease, ".tsv"))) {
+            
+            #####################
+            contrib_variants <- read_tsv(paste0(path_to_analysis, "/output/probandDataMatrix/probandDataMatrix_", disease, ".tsv"))
+            
+            print(paste0("Reading probandDataMatrix_", disease, ".tsv file"))
+            
+            contrib_variants <- contrib_variants %>%
+              dplyr::filter((drop_1 == 1 & drop_2 == 0) | (drop_1 == 0 & drop_2 == 1) | (drop_1 == 0 & drop_2 == 0) | (drop_1 == 0 & is.na(drop_2))) %>%
+              dplyr::filter(gene == sign_gene)
+            
+            # Filter variants based on the test that has been run
+            if (sign_test == "LoF") {
+              contrib_variants <- contrib_variants %>% dplyr::filter(max.vartype == "LoF")
+            } else if (sign_test == "zero80") {
+              contrib_variants <- contrib_variants %>% dplyr::filter(max.varscore >= 0.80)
+            } else if (sign_test == "denovo") {
+              contrib_variants <- contrib_variants %>% dplyr::filter(max.denovo == '1' & fam.structure >= 3)
+            } else {
+              contrib_variants <- contrib_variants %>% dplyr::filter(max.ccr == 1 & max.varscore >= 0.8)
+            }
+            
+            # Extract caco or caco.denovo info
+            if (sign_test == "denovo") {
+              contrib_variants$caco <- caco_def$caco.denovo[match(contrib_variants$sample.id, caco_def$sample.id)]
+            } else {
+              contrib_variants$caco <- caco_def$caco[match(contrib_variants$sample.id, caco_def$sample.id)]
+            }
+            
+            table(contrib_variants$caco, useNA = "always")
+            
+            cases_contrib <- contrib_variants %>% dplyr::filter(caco == 1)
+            controls_contrib <- contrib_variants %>% dplyr::filter(caco == 0)
+            
+            if (length(unique(cases_contrib$sample.id)) == pval_sign_gene_test$d) {
+              print(paste0("Match: ", length(unique(cases_contrib$sample.id)), " variants found == d (", pval_sign_gene_test$d, ")"))
+            } else {
+              print(paste0("Mismatch: ", length(unique(cases_contrib$sample.id)), " variants found != d (", pval_sign_gene_test$d, ")"))
+              break
+            }
+            
+            if (length(unique(controls_contrib$sample.id)) == pval_sign_gene_test$c) {
+              print(paste0("Match: ", length(unique(controls_contrib$sample.id)), " variants found == c (", pval_sign_gene_test$c, ")"))
+            } else {
+              print(paste0("Mismatch: ", length(unique(controls_contrib$sample.id)), " variants found != c (", pval_sign_gene_test$c, ")"))
+              break
+            }
+            
+            contrib_df <- contrib_variants %>%
+              dplyr::select(sample.id, variant.lift_1, variant.lift_2) %>%
+              reshape2::melt(id.vars = "sample.id") %>%
+              dplyr::filter(!is.na(value))
+            
+          }
           
           #Add readable caco definition
           gene_all$caco_definition<-ifelse(gene_all$caco==1,"case",NA)
@@ -1330,8 +1402,21 @@ if(plotting=="Y"){
             gene_test<- gene_all  %>% dplyr::filter(ccr.flag==1 & variant.score>=0.8)
           }
           
-          #Extract number of cases contributing to the test
-          cases<-gene_test %>% dplyr::filter(caco==1)
+          if (exists("contrib_df")) {
+            
+            gene_test$check <- ifelse(gene_test$sample.id %in% contrib_df$sample.id & gene_test$variant.lift %in% contrib_df$value, "Contrib", "Not contrib")
+            
+            gene_test$caco_definition <- ifelse(gene_test$caco_definition == "case" & gene_test$check == "Not contrib", "case_drop_varfilter", gene_test$caco_definition)
+            gene_test$caco_definition <- ifelse(gene_test$caco_definition == "control" & gene_test$check == "Not contrib", "control_drop_varfilter", gene_test$caco_definition)
+            gene_test$check<-NULL
+            
+          }
+          
+          table(gene_test$caco_definition, useNA = "always")
+          
+          # Extract number of cases contributing to the test
+          cases <- gene_test %>% dplyr::filter(caco_definition == "case")
+          controls <- gene_test %>% dplyr::filter(caco_definition == "control")
           
           if(length(unique(cases$sample.id))==pval_sign_gene_test$d){
             
@@ -1341,23 +1426,30 @@ if(plotting=="Y"){
             
             print(paste0("Mismatch: ",length(unique(cases$sample.id))," variants found != d (",pval_sign_gene_test$d,")"))
             
-            
           }
           
-          #Extract not contributing variants based on the test that has been run
-          if (sign_test=="LoF"){
-            not_contributing<- gene_all  %>% dplyr::filter(!vartype=="LoF")
-          }else if(sign_test=="zero80"){
-            not_contributing<- gene_all  %>% dplyr::filter(!variant.score>=0.80)
-          }else if(sign_test=="denovo"){
-            not_contributing<- gene_all  %>% dplyr::filter(!de.novo=='Y' & fam.structure >=3)
-          }else{
-            not_contributing<- gene_all  %>% dplyr::filter(!ccr.flag==1 & variant.score>=0.8)
+          
+          if (length(unique(controls$sample.id)) == pval_sign_gene_test$c) {
+            print(paste0("Match: ", length(unique(controls$sample.id)), " variants found == c (", pval_sign_gene_test$c, ")"))
+          } else {
+            print(paste0("Mismatch: ", length(unique(controls$sample.id)), " variants found != c (", pval_sign_gene_test$c, ")"))
+            break
           }
           
-          not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="case","not_contributing_case",not_contributing$caco_definition)
-          not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="control","not_contributing_control",not_contributing$caco_definition)
-          not_contributing$caco_definition<-ifelse(not_contributing$caco_definition=="excluded","not_contributing_excluded",not_contributing$caco_definition)
+          # Extract not contributing variants based on the test that has been run
+          if (sign_test == "LoF") {
+            not_contributing <- gene_all %>% dplyr::filter(vartype != "LoF")
+          } else if (sign_test == "zero80") {
+            not_contributing <- gene_all %>% dplyr::filter(variant.score < 0.80)
+          } else if (sign_test == "denovo") {
+            not_contributing <- gene_all %>% dplyr::filter(de.novo != 'Y' | fam.structure < 3)
+          } else {
+            not_contributing <- gene_all %>% dplyr::filter(ccr.flag != 1 | variant.score < 0.8)
+          }
+          
+          not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "case", "not_contributing_case", not_contributing$caco_definition)
+          not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "control", "not_contributing_control", not_contributing$caco_definition)
+          not_contributing$caco_definition <- ifelse(not_contributing$caco_definition == "excluded", "not_contributing_excluded", not_contributing$caco_definition)
           
           #Merge contributing and not contributing variants
           gene_test<-rbind(gene_test,not_contributing)
@@ -1369,19 +1461,22 @@ if(plotting=="Y"){
           gene_test<-gene_test %>% dplyr::select(caco_definition,caco,sample.id,hpo.terms,hpo.ids,gene,fam.structure,variant:ccr.flag,vartype,everything()) %>% dplyr::arrange(caco_definition,variant)
           
           #Eventually do some data cleaning
-          gene_test$hgvs<-sub(".$","",gene_test$hgvs)
-          gene_test$exomiser.result.count<-sub(".$","",gene_test$exomiser.result.count)
-          gene_test$genotypes<-sub(".$","",gene_test$genotypes)
+          gene_test$hgvs<-sub("\\|$","",gene_test$hgvs)
+          gene_test$exomiser.result.count<-sub("\\|$","",gene_test$exomiser.result.count)
+          gene_test$genotypes<-sub("\\|$","",gene_test$genotypes)
           
-          #Order table by case/control definition
-          caco_def_order<-c("case","excluded","control","not_contributing_case","not_contributing_excluded","not_contributing_control")
           
-          gene_test <- gene_test[order(factor(gene_test$caco_definition, levels=unique(caco_def_order))),]
+          # Order table by case/control definition
+          caco_def_order <- c("case", "case_drop_varfilter", "excluded", "control", "control_drop_varfilter", 
+                              "not_contributing_case", "not_contributing_excluded", "not_contributing_control")
+          
+          gene_test <- gene_test[order(factor(gene_test$caco_definition, levels = unique(caco_def_order))), ]
           
           #Write variants table
           write.table(gene_test,paste0(sign_gene_test,"_",disease,"_variants.tsv"), sep="\t", row.names = FALSE)
           
           print(paste0(sign_gene_test,"_",disease,"_variants.tsv written!"))
+          
         }
       }
     }
