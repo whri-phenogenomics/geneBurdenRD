@@ -1,0 +1,27 @@
+
+.RData
+.Rhistory
+data/exomiserPassWide.tsv
+output/matrix/NA.tsv.gz
+output/matrix/PFFS.tsv.gz
+output/fisher/PFFS.tsv
+results/geneBurdenRD_FDR_geneBurdenRD.tsv
+plots/Pfeiffer syndrome/FGFR2_zero80/FGFR2_zero80_lolliplot_PFFS.png
+plots/Pfeiffer syndrome/FGFR2_zero80/FGFR2_zero80_PFFS_variants.tsv
+plots/Pfeiffer syndrome/FGFR2_zero80/FGFR2_zero80_lolliplot_PFFS.tsv
+data/exomiser_master_file_final_passvars.tsv
+data/exomiser_master_file_passvars.tsv_orig
+all.sh
+exomiser_master_file_passvars.tsv.gz
+*.stderr
+*.stdout
+output/fisher/BBS.tsv
+output/matrix/BBS.tsv.gz
+plots/.DS_Store
+plots/Bardet-Biedel Syndrome/.DS_Store
+*.png
+plots/Pfeiffer syndrome/FGFR1_zero80/FGFR1_zero80_lolliplot_PFFS.tsv
+plots/Pfeiffer syndrome/FGFR1_zero80/FGFR1_zero80_PFFS_variants.tsv
+plots/Bardet-Biedel Syndrome/BBS1_zero80/BBS1_zero80_BBS_variants.tsv
+plots/Bardet-Biedel Syndrome/BBS1_zero80/BBS1_zero80_lolliplot_BBS.tsv
+.DS_Store

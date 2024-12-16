@@ -63,11 +63,11 @@ Then create a folder to redirect your standard error and standard output; in the
 To run the analysis locally:
 ```
 mkdir local
-sh scripts/geneBurdenRD_prepare_local.sh > local/geneBurdenRD_prepare.stdout 2> local/geneBurdenRD_prepare.stderr
-sh scripts/geneBurdenRD_matrix_local.sh > local/geneBurdenRD_matrix.stdout 2> local/geneBurdenRD_matrix.stderr
-sh scripts/geneBurdenRD_fisher_local.sh > local/geneBurdenRD_fisher.stdout 2> local/geneBurdenRD_fisher.stderr
-sh scripts/geneBurdenRD_padjust_local.sh > local/geneBurdenRD_padjust.stdout 2> local/geneBurdenRD_padjust.stderr
-sh scripts/geneBurdenRD_visualisation_local.sh > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
+sh scripts/geneBurdenRD_prepare_local.sh  > local/geneBurdenRD_prepare.stdout 2> local/geneBurdenRD_prepare.stderr
+sh scripts/geneBurdenRD_matrix_local.sh 2 > local/geneBurdenRD_matrix.stdout 2> local/geneBurdenRD_matrix.stderr
+sh scripts/geneBurdenRD_fisher_local.sh 2 > local/geneBurdenRD_fisher.stdout 2> local/geneBurdenRD_fisher.stderr
+sh scripts/geneBurdenRD_padjust_local.sh  > local/geneBurdenRD_padjust.stdout 2> local/geneBurdenRD_padjust.stderr
+sh scripts/geneBurdenRD_visualisation_local.sh 2 > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
 
 ```
 To run the analysis on an HPC cluster:

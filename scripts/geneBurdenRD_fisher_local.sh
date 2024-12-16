@@ -4,8 +4,12 @@
 # (path relative to cwd; otherwise, absolute path; in quotes)
 
 # Loop over all case-control analyses in "data/analysisLabelList.tsv"
-for I in {1..1}; do
-
+TOTAL=$1;
+if [ -z "$1" ]
+then
+        TOTAL=1;
+fi
+for I in `seq 1 $TOTAL`; do
    echo ${I}
    Rscript scripts/geneBurdenRD_fisher.R ${I} "data/analysisLabelList.tsv"
 
