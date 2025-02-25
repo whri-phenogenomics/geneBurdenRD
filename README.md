@@ -86,7 +86,7 @@ qsub scripts/geneBurdenRD_visualisation_cluster.sh
 
 ### Expected output from the demo data <a name="output"></a>
 
-The **_./results_** folder includes the **geneBurdenRD_FDR.tsv** file which provides summary statistics for all tests and includes:
+The **_./results_** folder includes the **geneBurdenRD_FDR_geneBurdenRD.tsv** file which provides summary statistics for all tests and includes:
 ```
 analysis.label      string representing the tested disease
 analysis            description of the disease tested
