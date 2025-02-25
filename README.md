@@ -18,6 +18,7 @@
 The R analytical framework only demands the presence of R or Rstudio and a standard computer with sufficient RAM to accommodate in-memory operations. The following R packages will need to be installed (if not already) via install.packages(‘packageName’) from R or install.packages("BiocManager") and BiocManager::install("packageName") for the biomaRt, ensembldb, drawProteins and AnnotationHub Bioconductor packages:
 
 ```R
+library("logistf")
 library("tidyverse")
 library("data.table")
 library("reshape2")
@@ -51,6 +52,8 @@ The installation comes with the following example data:
 
 **BBS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_11 to case_20 with a 1 in the caco column to signify these are the cases and then 100 ro$
 
+**sample_covariates.tsv** contains a header row (sample.id, age, family.structure, Participant.Phenotypic.Sex, inferred_anc) followed by the values for the 110 cases and controls for these potentially confounding factors. The default adjust Firth analysis in the testing script will adjust for these covariates.
+
 ### How to run the analysis on the demo data <a name="rundemo"></a>
 
 git clone or download zip geneBurdenRD as described above.\
@@ -65,7 +68,7 @@ To run the analysis locally:
 mkdir local
 sh scripts/geneBurdenRD_prepare_local.sh  > local/geneBurdenRD_prepare.stdout 2> local/geneBurdenRD_prepare.stderr
 sh scripts/geneBurdenRD_matrix_local.sh 2 > local/geneBurdenRD_matrix.stdout 2> local/geneBurdenRD_matrix.stderr
-sh scripts/geneBurdenRD_fisher_local.sh 2 > local/geneBurdenRD_fisher.stdout 2> local/geneBurdenRD_fisher.stderr
+sh scripts/geneBurdenRD_testing_local.sh 2 > local/geneBurdenRD_testing.stdout 2> local/geneBurdenRD_testing.stderr
 sh scripts/geneBurdenRD_padjust_local.sh  > local/geneBurdenRD_padjust.stdout 2> local/geneBurdenRD_padjust.stderr
 sh scripts/geneBurdenRD_visualisation_local.sh 2 > local/geneBurdenRD_visualisation.stdout 2> local/geneBurdenRD_visualisation.stderr
 
@@ -75,7 +78,7 @@ To run the analysis on an HPC cluster:
 mkdir cluster
 qsub scripts/geneBurdenRD_prepare_cluster.sh
 qsub scripts/geneBurdenRD_matrix_cluster.sh
-qsub scripts/geneBurdenRD_fisher_cluster.sh
+qsub scripts/geneBurdenRD_testing_cluster.sh
 qsub scripts/geneBurdenRD_padjust_cluster.sh
 qsub scripts/geneBurdenRD_visualisation_cluster.sh
 

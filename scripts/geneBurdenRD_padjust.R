@@ -21,7 +21,7 @@ read_tsv(flnm, col_types = c("ccccddddddddddd"), col_names = TRUE) %>%
 }
 
 # Get list of p-value disease files ----
-pvalFileList <- list.files(path = "output/fisher", pattern = "*.tsv", full.names = T)
+pvalFileList <- list.files(path = "output/testing", pattern = "*.tsv", full.names = T)
 # Display how many diseases were tested
 print("Total number of diseases tested:")
 length(pvalFileList)
