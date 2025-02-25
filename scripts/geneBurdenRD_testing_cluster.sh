@@ -18,7 +18,9 @@ module load R/4.1.0
 # args[1]. job index: e.g. $SGE_TASK_ID
 # arg[2]. path for file containing list of case-control analysis labels in quotes: e.g. "data/analysisLabelList.tsv"
 
-Rscript scripts/geneBurdenRD_fisher.R $SGE_TASK_ID "data/analysisLabelList.tsv"
+Rscript scripts/geneBurdenRD_testing.R $SGE_TASK_ID "data/analysisLabelList.tsv" "adjfirth" "data/sample_covariates.tsv" "age,Participant.Phenotypic.Sex,inferred_anc,family.structure" "age$
+#Rscript scripts/geneBurdenRD_testing.R $SGE_TASK_ID "data/analysisLabelList.tsv" "firth"
+#Rscript scripts/geneBurdenRD_testing.R $SGE_TASK_ID "data/analysisLabelList.tsv" "fisher"
 
 # To run this script on a cluster, from 'geneBurdenRD' folder:
 # qsub scripts/geneBurdenRD_fisher_cluster.sh
