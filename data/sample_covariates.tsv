@@ -19,7 +19,7 @@ case_6	35	3+	male	European
 case_7	33	3+	female	European
 case_8	35	3+	male	South Asian
 case_9	30	3+	female	European
-control_1	38	3+	male	European
+control_1	38	2	male	European
 control_10	33	3+	female	European
 control_100	39	3+	male	European
 control_11	30	3+	female	European
