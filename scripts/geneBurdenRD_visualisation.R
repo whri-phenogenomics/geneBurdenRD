@@ -1,6 +1,6 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# 
 #        Visualisation          #
-#      Gene Burdern Test        # 
+#      Gene Burden Test        # 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 # Use R/4.1.0
