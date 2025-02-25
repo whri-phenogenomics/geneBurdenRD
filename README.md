@@ -11,7 +11,7 @@
 7. [Contact us](#contact)
 
 ##  Overview <a name="overview"></a>
-**_geneBurdenRD_** is an open-source R analytical framework that allows users to perform gene burden testing of variants in user-defined cases versus controls from rare disease sequencing cohorts. The input to the framework is a file obtained from processing Exomiser output files for each of the cohort samples, a file containing a label for each case-control association analysis to perform within the cohort and a (set of) corresponding file(s) with user-defined identifiers and case/control assignment per each sample. Cases and controls in a cohort could be defined in many ways, including by recruited disease category, by specific phenotypic annotations or phenotypic clustering. The framework will then assess false discovery rate (FDR)-adjusted disease-gene associations where genes are tested for an enrichment in cases vs controls of rare, protein-coding, segregating variants that are either (i) predicted loss-of-function (LoF), (ii) highly predicted pathogenic (Exomiser variant score >= 0.8), (iii) highly predicted pathogenic and present in a constrained coding region (CCR; 13) or (iv) de novo (restricted to only trios or larger families where de novo calling was possible and provided by the user). As well as various output files annotating these case-control association tests, Manhattan and volcano plots are generated summarising the FDR-adjusted p-values of all the gene-based tests for each case-control association analysis, along with lollipop plots of the relevant variants in cases and controls and plots of the hierarchical distribution of the Human Phenotype Ontology (HPO) case annotations for individual disease-gene associations.
+**_geneBurdenRD_** is an open-source R analytical framework that allows users to perform gene burden testing of variants in user-defined cases versus controls from rare disease sequencing cohorts. The input to the framework is a file obtained from processing Exomiser output files for each of the cohort samples, a file containing a label for each case-control association analysis to perform within the cohort and a (set of) corresponding file(s) with user-defined identifiers and case/control assignment per each sample. Cases and controls in a cohort could be defined in many ways, including by recruited disease category, by specific phenotypic annotations or phenotypic clustering. The framework will then assess false discovery rate (FDR)-adjusted disease-gene associations where genes are tested for an enrichment in cases vs controls of rare, protein-coding, segregating variants that are either (i) predicted loss-of-function (LoF), (ii) highly predicted pathogenic (Exomiser variant score >= 0.8), (iii) highly predicted pathogenic and present in a constrained coding region (CCR) or (iv) de novo (restricted to only trios or larger families where de novo calling was possible and provided by the user). As well as various output files annotating these case-control association tests, Manhattan and volcano plots are generated summarising the FDR-adjusted p-values of all the gene-based tests for each case-control association analysis, along with lollipop plots of the relevant variants in cases and controls and plots of the hierarchical distribution of the Human Phenotype Ontology (HPO) case annotations for individual disease-gene associations.
 
 ## System requirements <a name="requirements"></a>
 ### Software dependencies and operating systems <a name="dependencies"></a>
@@ -92,7 +92,7 @@ analysis.label      string representing the tested disease
 analysis            description of the disease tested
 gene	            Exomiser gene
 test	            null hypothesis tested (LoF, zero80, denovo or CCR)
-pvalue		    p-value after one-sided Fisher Exact test
+pvalue		    p-value from one-sided Fisher's Exact test (args[3] 'fisher' in testing), or Firth's logistic regression (args[3] 'firth' in testing), or covariate-adjusted Firth's logistic regression (args[3] 'adjfirth' in testing)
 p.adjust.fdr	    p-value after false discovery rate (FDR) adjustment
 or	            odds ratio
 d	            number of cases with the event
@@ -105,7 +105,7 @@ upclor 		    odds ratio upper confidence limit
 a	            number of controls without the event
 b	            number of cases without the event
 c	            number of controls with the event
-filename	    path to corresponding fisher.tsv file
+filename	    path to corresponding testing.tsv file
 bonferroni.cutoff   Bonferroni correction
 ```
 
@@ -114,9 +114,8 @@ The output of the visualization script is explained below.
 The **_./plots_** folder includes individual subfolders for each analysis, each containing at least one significant signal.
 
 Each analysis subfolder contains:\
-► one **Manhattan-like plot** for the analysis: the x-axis is the chromosome position and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed line represents the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold. Please note that this visualisation is only available for genome-wide analysis.
 
-► one **volcano plot** for the specific disease: the x-axis is the log2 of the odds ratio and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table before running the Fisher exact test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed lines represent the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold and odds ratio >= 3. Please note that this visualisation is only available for genome-wide analysis.			
+► one **volcano plot** for the specific disease: the x-axis is the log2 of the odds ratio and the y-axis is the -log10 of the p-value after FDR adjustment. Each dot represents a test that passed the minimum requirements for the contingency table to test (d≥1, TotCases≥5 and TotEvent≥4). Each colour represents the null hypothesis that was tested. The dashed lines represent the user-selected significant thresholds, indicating a p-value considered significant after adjusting for false discovery rate (FDR) that is lower than the user-specified threshold and odds ratio >= 3. Please note that this visualisation is only available for genome-wide analysis.			
 
 ► one subfolder per each significant gene-test: * please note that the null hypothesis tested are LoF, zero80 (Exomiser variant score>=0.8), denovo or CCR (constrained coding regions).
 
@@ -159,12 +158,12 @@ perl produce_generic_exomiser_master_file_final.pl <samples file> <optional de n
 2. **analysisLabelList.tsv** is the list of analyses to be run. It requires two columns: analysis.label and analysis\
 3. **analysis.label.tsv** are the case-control definitions. One per each analysis.label are required. It demands two columns: sample.id, caco and optionally caco.denovo (restricted to family.size >=3). The columns caco and caco.denovo defines the classification of cases, controls, and probands excluded from either. These columns assume values of 1, 0, or NA accordingly.
 
-Please note that when working with your own data, it's necessary to edit the loop in some of the local shell scripts or the task id in the job arrays for the HPC cluster based on the number of diseases you intend to test. For example, when analysing three diseases from the analysisLabelList.tsv file, modify the following loop structure in the matrix, fisher and visualization local shell scripts:
+Please note that when working with your own data, it's necessary to edit the loop in some of the local shell scripts or the task id in the job arrays for the HPC cluster based on the number of diseases you intend to test. For example, when analysing three diseases from the analysisLabelList.tsv file, modify the following loop structure in the matrix, testing and visualization local shell scripts:
 
 ```
 for I in {1..3}; do
 ```
-or the task id in the matrix, fisher and visualization cluster shell scripts:
+or the task id in the matrix, testing and visualization cluster shell scripts:
 ```
 #$ -t 1-3
 ```
@@ -172,7 +171,8 @@ or the task id in the matrix, fisher and visualization cluster shell scripts:
 ## Flowchart of the analytical framework <a name="flowchart"></a>
 
 <p align="center">
-<img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
+#<img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
+![README_image.png](readmeimages/README_image.png)
 </p>
 
 ## Contact us <a name="contact"></a>
