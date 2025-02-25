@@ -48,9 +48,9 @@ The installation comes with the following example data:
 
 **analysisLabelList.tsv** contains a header row (analysis.label, analysis), followed by rows that specify a string representing the tested disease (e.g., PFFS) and a description of the disease tested (e.g., Pfeiffer syndrome).
 
-**PFFS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_10 with a 0 in the caco column to indicate controls.
+**PFFS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_1 to case_10 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_100 with a 0 in the caco column to indicate controls.
 
-**BBS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_11 to case_20 with a 1 in the caco column to signify these are the cases and then 100 ro$
+**BBS.tsv** contains a header row (sample.id, caco,caco.denovo) followed by 10 rows for case_11 to case_20 with a 1 in the caco column to signify these are the cases and then 100 rows for control_1 to control_100 with a 0 in the caco column to indicate controls.
 
 **sample_covariates.tsv** contains a header row (sample.id, age, family.structure, Participant.Phenotypic.Sex, inferred_anc) followed by the values for the 110 cases and controls for these potentially confounding factors. The default adjust Firth analysis in the testing script will adjust for these covariates.
 
