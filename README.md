@@ -171,7 +171,7 @@ or the task id in the matrix, testing and visualization cluster shell scripts:
 ## Flowchart of the analytical framework <a name="flowchart"></a>
 
 <p align="center">
-<img src="https://github.com/letiziavestito/Figure/blob/dd828cf54e26ac96ab70a9f729339fed9587329c/GB_pipeline_final.png" width="700" height="1600">
+<img src="https://github.com/letiziavestito/Figure/blob/main/README_mod.png" width="700" height="1600">
 </p>
 
 ## Contact us <a name="contact"></a>
